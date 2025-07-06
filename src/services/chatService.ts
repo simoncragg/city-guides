@@ -2,7 +2,7 @@ import type { ChatMessage } from "../types";
 
 async function sendMessageAsync(message: ChatMessage): Promise<ChatMessage> {
 
-  const res = await fetch("/.netlify/functions/echoMessage", {
+  const res = await fetch("/.netlify/functions/processMessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(message),
