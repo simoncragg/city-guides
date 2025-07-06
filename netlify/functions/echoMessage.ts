@@ -1,3 +1,5 @@
+import { buildAgentMessage } from "../../src/builders/messageBuilder";
+
 const echoMessage = async (request: Request): Promise<Response> => {
 
   if (request.method !== "POST") {
@@ -5,7 +7,9 @@ const echoMessage = async (request: Request): Promise<Response> => {
   }
 
   const body = await request.text();
-  return new Response(body, { status: 200 });
+  const userMessage = JSON.parse(body);
+  const agentMessage = buildAgentMessage(userMessage.text);
+  return createResponse(agentMessage, 200);
 }
 
 const createResponse = (body: Record<string, unknown>, status: number): Response => {

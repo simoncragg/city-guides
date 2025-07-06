@@ -1,8 +1,11 @@
 import React, { useRef } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 
+import type { ChatMessage } from "../types";
+import { buildUserMessage } from "../builders/messageBuilder";
+
 interface InputBoxProps {
-	onSubmit: (text: string) => void;
+	onSubmit: (message: ChatMessage) => void;
 }
 
 const InputBox: React.FC<InputBoxProps> = ({ onSubmit }) => {
@@ -12,7 +15,9 @@ const InputBox: React.FC<InputBoxProps> = ({ onSubmit }) => {
 	const handleSubmit = () => {
 		const text = textareaRef?.current?.value.trim()
     if (text) {
-			onSubmit(text);
+			const message = buildUserMessage(text);
+			onSubmit(message);
+			textareaRef!.current!.value = "";
 		}
 	};
 
