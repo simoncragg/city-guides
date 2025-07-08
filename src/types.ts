@@ -1,8 +1,6 @@
-export type RoleType = "user" | "agent";
+export type RoleType = "system" | "user" | "assistant";
 
 export interface ChatMessage {
-  id: string;
   role: RoleType;
-  text: string;
+  content: string;
 }
-

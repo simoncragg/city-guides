@@ -1,20 +1,14 @@
-import { v4 as uuidv4 } from "uuid";
 import type { RoleType } from "../types";
 
-function buildUserMessage(text: string) {
-  return buildMessage("user", text);
+function buildUserMessage(content: string) {
+  return buildMessage("user", content);
 }
 
-function buildAgentMessage(text: string) {
-  return buildMessage("agent", text);
-}
-
-function buildMessage(role: RoleType, text: string) {
+function buildMessage(role: RoleType, content: string) {
   return { 
-    id: uuidv4(), 
     role: role, 
-    text,
+    content,
   };
 }
 
-export { buildUserMessage, buildAgentMessage };
+export { buildUserMessage };

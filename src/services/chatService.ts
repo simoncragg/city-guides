@@ -1,19 +1,19 @@
 import type { ChatMessage } from "../types";
 
-async function sendMessageAsync(message: ChatMessage): Promise<ChatMessage> {
+async function sendMessageAsync(sessionId: string | null, message: ChatMessage): Promise<ChatMessage> {
 
-  const res = await fetch("/.netlify/functions/processMessage", {
+  const response = await fetch(`/.netlify/functions/processMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(message),
+    body: JSON.stringify({ sessionId, message }),
   });
 
-  if (!res.ok) {
-    const errText = await res.text()
-    throw new Error(`HTTP ${res.status} ${res.statusText}: ${errText}`);
+  if (!response.ok) {
+    const errText = await response.text()
+    throw new Error(`HTTP ${response.status} ${response.statusText}: ${errText}`);
   }
 
-  return res.json();
+  return response.json();
 }
 
 export { sendMessageAsync };
