@@ -16,7 +16,7 @@ npm i
 
 ### Run the app
 ```bash
-npm run dev
+npm run dev:net
 ```
 
 ## MIT License
