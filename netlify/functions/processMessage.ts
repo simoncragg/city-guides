@@ -1,7 +1,8 @@
 import type { ProcessMessagePayload } from "../types";
 import createResponse from "../utils/createResponse";
-import { HttpError, assert } from "../utils/assert";
 import handleChat from "../handlers/handleChat";
+import { HttpError, assert } from "../utils/assert";
+
 
 async function processMessage(request: Request): Promise<Response> {
 
@@ -26,9 +27,9 @@ async function parseBody(request: Request): Promise<ProcessMessagePayload> {
   }
 }
 
-function handleError(error: unknown): Response | PromiseLike<Response> {
+function handleError(error: unknown): Response {
   console.error(error);
-
+  
   if (error instanceof HttpError) {
     return createResponse({ message: error.message }, error.status);
   }
