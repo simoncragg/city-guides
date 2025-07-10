@@ -1,5 +1,7 @@
 # 🏙️ City Guides
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/deeced3f-b023-4795-8f0f-49e8b711fcf0/deploy-status)](https://app.netlify.com/projects/city-guides/deploys)
+
 City Guides is an experimental, open-source app built to explore OpenAI’s Agents SDK. It uses a multi-agent architecture where each agent provides expert local knowledge for one specific city.
 
 ## Getting Started
