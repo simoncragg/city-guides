@@ -1,23 +1,31 @@
 import React, { useRef } from "react";
-import { FaArrowUp } from "react-icons/fa6";
+import { FaArrowUp, FaStop } from "react-icons/fa6";
 
 import type { ChatMessageType } from "../types";
 import { buildUserMessage } from "../builders/messageBuilder";
 
 interface InputBoxProps {
   pinToBottom: boolean;
-  onSubmit: (message: ChatMessageType) => void;
+  isSending: boolean;
+  onSend: (message: ChatMessageType) => void;
+  onCancel: () => void;
 }
 
-const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, onSubmit }) => {
+const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isSending, onSend, onCancel }) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = () => {
+  const handleActionButtonClick = () => {
+
+    if (isSending) {
+      onCancel();
+      return;
+    }
+
     const text = textareaRef?.current?.value.trim()
     if (text) {
       const message = buildUserMessage(text);
-      onSubmit(message);
+      onSend(message);
       textareaRef!.current!.value = "";
     }
   };
@@ -35,11 +43,11 @@ const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, onSubmit }) => {
         />
         <button
           type="button"
-          aria-label="Send question"
-          onClick={handleSubmit}
+          aria-label={isSending ? "Stop" : "Send"}
+          onClick={handleActionButtonClick}
           className="absolute bottom-3 right-2 p-3 bg-sky-500 text-white rounded-full shadow hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
         >
-          <FaArrowUp />
+          {isSending ? <FaStop /> : <FaArrowUp />}
         </button>
       </div>
     </div>
