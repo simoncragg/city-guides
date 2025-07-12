@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import type { AgentMessage, ChatMessage } from "../types";
 
 interface ChatLogProps {
   messages: (ChatMessage | AgentMessage)[];
 };
 
 const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
+
+  const bottomRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <ul className="grid gap-2 relative">
@@ -19,6 +26,7 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
           )}
         </li>
       ))}
+      <li ref={bottomRef} />
     </ul>
   );
 };
