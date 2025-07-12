@@ -21,7 +21,7 @@ const Chat: React.FC = () => {
   return (
     <div className="m-4 pb-16">
       <ChatLog messages={messages} />
-      <InputBox onSubmit={sendUserMessage} />
+      <InputBox pinToBottom={messages.length > 0} onSubmit={sendUserMessage} />
     </div>
   );
 };

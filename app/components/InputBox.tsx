@@ -5,10 +5,11 @@ import type { ChatMessageType } from "../types";
 import { buildUserMessage } from "../builders/messageBuilder";
 
 interface InputBoxProps {
+  pinToBottom: boolean;
   onSubmit: (message: ChatMessageType) => void;
 }
 
-const InputBox: React.FC<InputBoxProps> = ({ onSubmit }) => {
+const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, onSubmit }) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -22,7 +23,7 @@ const InputBox: React.FC<InputBoxProps> = ({ onSubmit }) => {
   };
 
   return (
-    <div className="fixed inset-x-0 p-4 bottom-0">
+    <div className={`fixed inset-x-0 p-4 ${pinToBottom ? "bottom-0" : "bottom-1/2 translate-y-1/2"} transition-all duration-500 ease-in-out`}>
       <div className="max-w-md mx-auto relative">
         <textarea
           ref={textareaRef}
