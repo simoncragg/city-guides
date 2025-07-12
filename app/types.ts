@@ -1,10 +1,10 @@
 export type RoleType = "system" | "user" | "assistant";
 
-export type ChatMessage = {
+export type ChatMessageType = {
   role: RoleType;
   content: string;
 };
 
-export type AgentMessage = ChatMessage & {
+export type AgentMessageType = ChatMessageType & {
   agent: string;
 };

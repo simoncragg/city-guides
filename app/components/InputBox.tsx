@@ -1,11 +1,11 @@
 import React, { useRef } from "react";
 import { FaArrowUp } from "react-icons/fa6";
 
-import type { ChatMessage } from "../types";
+import type { ChatMessageType } from "../types";
 import { buildUserMessage } from "../builders/messageBuilder";
 
 interface InputBoxProps {
-	onSubmit: (message: ChatMessage) => void;
+	onSubmit: (message: ChatMessageType) => void;
 }
 
 const InputBox: React.FC<InputBoxProps> = ({ onSubmit }) => {

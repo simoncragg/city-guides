@@ -1,6 +1,6 @@
-import type { ChatMessage } from "../types";
+import type { ChatMessageType, AgentMessageType } from "../types";
 
-async function sendMessageAsync(sessionId: string | null, message: ChatMessage): Promise<ChatMessage> {
+async function sendMessageAsync(sessionId: string | null, message: ChatMessageType): Promise<AgentMessageType> {
 
   const response = await fetch(`/.netlify/functions/processMessage`, {
     method: "POST",
