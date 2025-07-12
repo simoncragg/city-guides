@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from "react";
+import { marked } from "marked";
+
 import type { AgentMessage, ChatMessage } from "../types";
 
 interface ChatLogProps {
@@ -14,15 +16,21 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
   }, [messages]);
 
   return (
-    <ul className="grid gap-2 relative">
+    <ul className="grid gap-8 relative">
       {messages.map((message, idx) => (
-        <li key={idx} className="flex">
+        <li key={idx} className="grid items-start gap-2">
           {message.role === "user" ? (
-            <p className="inline-block px-4 py-2 rounded-2xl max-w-[60%] bg-sky-800/50 text-gray-100 ml-auto">
+            <div className="px-4 py-3 rounded-2xl bg-sky-800/50 text-gray-100 ml-auto">
               {message.content}
-            </p>
-           ) : (
-            <p className="p-2 text-gray-70">{(message as AgentMessage).agent}: {message.content}</p>
+            </div>
+          ) : (
+            <div className="flex flex-row gap-4">
+              <div>{(message as AgentMessage).agent}:</div>
+              <div 
+                className="text-gray-700 space-y-4" 
+                dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }} 
+              />
+            </div>
           )}
         </li>
       ))}
