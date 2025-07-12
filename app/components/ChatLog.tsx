@@ -24,12 +24,16 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
               {message.content}
             </div>
           ) : (
-            <div className="flex flex-row gap-4">
-              <div>{(message as AgentMessage).agent}:</div>
-              <div 
-                className="text-neutral-950 space-y-4" 
-                dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }} 
-              />
+            <div className="flex flex-row gap-6">
+              <img 
+                src={`/app/assets/avatars/${(message as AgentMessage).agent}-sm-min.png`} 
+                className="w-[48px] h-[50px]"
+                alt={(message as AgentMessage).agent}>
+              </img>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-semibold">{(message as AgentMessage).agent}</span>
+                <div className="text-neutral-950 space-y-4" dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }} />
+              </div>
             </div>
           )}
         </li>
