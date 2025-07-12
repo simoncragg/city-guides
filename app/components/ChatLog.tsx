@@ -20,14 +20,14 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
       {messages.map((message, idx) => (
         <li key={idx} className="grid items-start gap-2">
           {message.role === "user" ? (
-            <div className="px-4 py-3 rounded-2xl bg-sky-800/50 text-gray-100 ml-auto">
+            <div className="px-4 py-3 rounded-2xl bg-gray-100 ml-auto">
               {message.content}
             </div>
           ) : (
             <div className="flex flex-row gap-4">
               <div>{(message as AgentMessage).agent}:</div>
               <div 
-                className="text-gray-700 space-y-4" 
+                className="text-neutral-950 space-y-4" 
                 dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }} 
               />
             </div>

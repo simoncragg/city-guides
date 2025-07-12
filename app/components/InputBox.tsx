@@ -29,37 +29,13 @@ const InputBox: React.FC<InputBoxProps> = ({ onSubmit }) => {
 					aria-label="Ask anything"
 					placeholder="Ask anything"
 					rows={2}
-					className="
-						w-full 
-						px-4 
-						py-3 
-						rounded-3xl 
-						border border-gray-200 
-						bg-gray-50 
-						text-gray-700 
-						shadow-sm 
-						resize-none 
-						focus:outline-none 
-						focus:ring-2 focus:ring-sky-400
-					"
+					className="w-full px-4 py-3 rounded-3xl border border-gray-200 bg-gray-50 text-neutral-950 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-400"
 				/>
 				<button
 					type="button"
 					aria-label="Send question"
 					onClick={handleSubmit}
-					className="
-						absolute 
-						bottom-3 right-2
-						p-3 
-						bg-sky-500 
-						text-white 
-						rounded-full 
-						shadow 
-						hover:bg-sky-600 
-						focus:outline-none 
-						focus:ring-2 focus:ring-sky-400
-						transition
-					"
+					className="absolute bottom-3 right-2 p-3 bg-sky-500 text-white rounded-full shadow hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
 				>
 					<FaArrowUp />
 				</button>
