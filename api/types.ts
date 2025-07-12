@@ -7,6 +7,10 @@ export type ChatMessage = {
   content: string;
 };
 
+export type AgentMessage = ChatMessage & {
+  agent?: string;
+};
+
 export type ProcessMessagePayload = {
   sessionId: string;
   message: ChatMessage;
@@ -14,7 +18,7 @@ export type ProcessMessagePayload = {
 
 export type ChatSession = {
   id: string;
-  name: string;
   messages: AgentInputItem[];
+  last_agent: string;
   created_at: string;
 };

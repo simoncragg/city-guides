@@ -1,33 +1,25 @@
-import type { AgentInputItem } from "@openai/agents";
-import { Agent, InputGuardrailTripwireTriggered, run } from "@openai/agents";
+import { InputGuardrailTripwireTriggered, run, type AgentInputItem } from "@openai/agents";
 
-import type { ChatMessage, ChatSession } from "../types";
-import travelTopicGuardrail from "../guardrails/travelTopicGuardrail";
+import type { AgentMessage, ChatMessage, ChatSession } from "../types";
+
+import silentRouter from "../agents/silentRouter";
 import { assert } from "../utils/assert";
 import { createSession, getSession, updateSession } from "../db/session";
 
-
-async function handleChat(sessionId: string, userMessage: ChatMessage): Promise<ChatMessage> {
+async function handleChat(sessionId: string, userMessage: ChatMessage): Promise<AgentMessage> {
   
   const session = await getChatSession(sessionId);
-  
-  const agent = new Agent({
-    name: "City Guide",
-    model: "gpt-4o",
-    instructions: "You are a city guide",
-    inputGuardrails: [travelTopicGuardrail]
-  });
-
   const thread = [...session.messages, userMessage] as AgentInputItem[];
 
   try {
-    const result = await run(agent, thread);
+    const result = await run(silentRouter, thread);
     assert(result.finalOutput, "Agent couldn't generate a reply", 500);
-    await updateSession(session.id, result.history);
+    await updateSession(session.id, result.history, result.lastAgent?.name);
 
     return { 
       role: "assistant",
-        content: result.finalOutput
+      content: result.finalOutput,
+      agent: result.lastAgent?.name
     };
   }
   catch (error: unknown) {
@@ -43,10 +35,11 @@ async function getChatSession(sessionId: string): Promise<ChatSession> {
 }
 
 function handleError(error: unknown): ChatMessage {
+  
   if (error instanceof InputGuardrailTripwireTriggered) {
     return { 
       role: "assistant",
-      content: "Sorry, I can only assist with city-break questions."
+      content: "Sorry, I can only assist with city breaks."
     };
   }
 
