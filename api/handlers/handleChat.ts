@@ -34,12 +34,13 @@ async function getChatSession(sessionId: string): Promise<ChatSession> {
     : await createSession(sessionId);
 }
 
-function handleError(error: unknown): ChatMessage {
+function handleError(error: unknown): AgentMessage {
   
   if (error instanceof InputGuardrailTripwireTriggered) {
     return { 
       role: "assistant",
-      content: "Sorry, I can only assist with city breaks."
+      content: "Sorry, we can only assist with city breaks.",
+      agent: "Victoria",
     };
   }
 
