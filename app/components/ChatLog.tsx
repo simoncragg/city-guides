@@ -17,7 +17,7 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
   }, [messages]);
 
   return (
-    <ul className="grid gap-8 relative">
+    <ul className="grid gap-10 md:gap-16 relative">
       {messages.map((message, idx) => (
         <li key={idx} className="grid items-start gap-2">
           {message.role === "user" ? (

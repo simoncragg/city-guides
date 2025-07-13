@@ -3,7 +3,7 @@ import Chat from "./components/Chat";
 function App() {
 
   return (
-    <main className="flex flex-col min-h-screen bg-white px-4 py-8">
+    <main className="flex flex-col min-h-screen bg-white px-2 py-8">
 
       <div className="flex-1 flex flex-col items-center justify-center">
         <img src="/app/assets/logo-min.png" className="text-9xl mb-3 md:max-w-[600px]" alt="City Guides"></img>

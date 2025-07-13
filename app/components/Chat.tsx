@@ -45,7 +45,7 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="m-4 pb-16">
+    <div className="m-2 md:m-4 pb-16">
       <ChatLog messages={messages} />
       <InputBox 
         pinToBottom={messages.length > 0} 
