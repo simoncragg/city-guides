@@ -53,7 +53,8 @@ const Chat: React.FC = () => {
         pinToBottom={messages.length > 0} 
         isThinking={isThinking} 
         onSend={sendMessage} 
-        onCancel={abortMessage} />
+        onCancel={abortMessage}
+      />
     </div>
   );
 };
