@@ -7,6 +7,8 @@ import ChatLog from "./ChatLog";
 import InputBox from "./InputBox";
 import { sendMessageAsync } from "../services/chatService";
 
+const ABORT_MESSAGE_REASON = "User Cancelled";
+
 const Chat: React.FC = () => {
 
   const abortController = useRef<AbortController>(new AbortController());
@@ -29,7 +31,7 @@ const Chat: React.FC = () => {
       setMessages(prev => [...prev, agentMessage]);
     }
     catch(error: unknown) {
-      if ((error as DOMException).name !== "AbortError") {
+      if (error !== ABORT_MESSAGE_REASON) {
         console.error(error);
       }
     }
@@ -39,7 +41,7 @@ const Chat: React.FC = () => {
   };
 
   const abortMessage = () => {
-    abortController.current.abort("user cancelled");
+    abortController.current.abort(ABORT_MESSAGE_REASON);
     abortController.current = new AbortController();
     setIsThinking(false);
   };
