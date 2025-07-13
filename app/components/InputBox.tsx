@@ -6,18 +6,18 @@ import { buildUserMessage } from "../builders/messageBuilder";
 
 interface InputBoxProps {
   pinToBottom: boolean;
-  isSending: boolean;
+  isThinking: boolean;
   onSend: (message: ChatMessageType) => void;
   onCancel: () => void;
 }
 
-const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isSending, onSend, onCancel }) => {
+const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isThinking, onSend, onCancel }) => {
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleActionButtonClick = () => {
 
-    if (isSending) {
+    if (isThinking) {
       onCancel();
       return;
     }
@@ -43,11 +43,11 @@ const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isSending, onSend, onC
         />
         <button
           type="button"
-          aria-label={isSending ? "Stop" : "Send"}
+          aria-label={isThinking ? "Stop" : "Send"}
           onClick={handleActionButtonClick}
           className="absolute bottom-3 right-2 p-3 bg-sky-500 text-white rounded-full shadow hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
         >
-          {isSending ? <FaStop /> : <FaArrowUp />}
+          {isThinking ? <FaStop /> : <FaArrowUp />}
         </button>
       </div>
     </div>

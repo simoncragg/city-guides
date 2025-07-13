@@ -13,11 +13,11 @@ const Chat: React.FC = () => {
 
   const [sessionId] = useState<string | null>(uuidv4());
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
-  const [isSending, setIsSending] = useState<boolean>(false);
+  const [isThinking, setIsThinking] = useState<boolean>(false);
 
   const sendMessage = async (userMessage: ChatMessageType) => {
 
-    setIsSending(true);
+    setIsThinking(true);
     setMessages(prev => [...prev, userMessage]);
     
     try {
@@ -34,22 +34,22 @@ const Chat: React.FC = () => {
       }
     }
     finally {
-      setIsSending(false);
+      setIsThinking(false);
     }
   };
 
   const abortMessage = () => {
     abortController.current.abort("user cancelled");
     abortController.current = new AbortController();
-    setIsSending(false);
+    setIsThinking(false);
   };
 
   return (
-    <div className="m-2 md:m-4 pb-16">
-      <ChatLog messages={messages} />
+    <div className="m-2 md:m-4 pb-24">
+      <ChatLog messages={messages} isThinking={isThinking} />
       <InputBox 
         pinToBottom={messages.length > 0} 
-        isSending={isSending} 
+        isThinking={isThinking} 
         onSend={sendMessage} 
         onCancel={abortMessage} />
     </div>
