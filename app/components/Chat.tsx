@@ -1,49 +1,71 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import type { ChatMessageType } from "../types";
+import type { AgentMessageType, ChatMessageType } from "../types";
 
 import ChatLog from "./ChatLog";
 import InputBox from "./InputBox";
-import { sendMessageAsync } from "../services/chatService";
+import { runMessageStream } from "../services/chatService";
 
 const ABORT_MESSAGE_REASON = "User Cancelled";
 
 const Chat: React.FC = () => {
 
-  const abortController = useRef<AbortController>(new AbortController());
+  const abortControllerRef = useRef<AbortController>(new AbortController());
 
   const [sessionId] = useState<string | null>(uuidv4());
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isThinking, setIsThinking] = useState<boolean>(false);
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
 
-  const sendMessage = async (userMessage: ChatMessageType) => {
-
-    setIsThinking(true);
-    setMessages(prev => [...prev, userMessage]);
+  const streamMessage = async (userMessage: ChatMessageType) => {
     
+    setMessages(prev => [...prev, userMessage]);
+    setIsThinking(true);
+
     try {
-      const agentMessage = await sendMessageAsync(
-        sessionId, 
-        userMessage, 
-        abortController.current.signal
-      );
-      setMessages(prev => [...prev, agentMessage]);
-    }
-    catch(error: unknown) {
+      await runMessageStream(sessionId, userMessage, abortControllerRef.current.signal, (_, data) => {
+        const { agent, content } = JSON.parse(data); 
+        setIsThinking(false);
+        setIsStreaming(true);
+
+        setMessages(prev => {
+          if (!prev.length || prev[prev.length - 1].role !== "assistant") {
+            return [
+              ...prev,
+              {
+                role: "assistant",
+                content,
+                agent
+              } as AgentMessageType,
+            ];
+          }
+
+          const last   = prev[prev.length - 1] as AgentMessageType;
+          const merged = {
+            ...last,
+            agent: last.agent ?? agent,
+            content: last.content + content,
+          };
+
+          return [...prev.slice(0, -1), merged];
+        });
+      });
+    } catch (error) {
       if (error !== ABORT_MESSAGE_REASON) {
         console.error(error);
       }
-    }
-    finally {
-      setIsThinking(false);
+    } finally {
+      setIsThinking(false)
+      setIsStreaming(false)
     }
   };
 
   const abortMessage = () => {
-    abortController.current.abort(ABORT_MESSAGE_REASON);
-    abortController.current = new AbortController();
+    abortControllerRef.current.abort(ABORT_MESSAGE_REASON);
+    abortControllerRef.current = new AbortController();
     setIsThinking(false);
+    setIsStreaming(false);
   };
 
   return (
@@ -51,8 +73,8 @@ const Chat: React.FC = () => {
       <ChatLog messages={messages} isThinking={isThinking} />
       <InputBox 
         pinToBottom={messages.length > 0} 
-        isThinking={isThinking} 
-        onSend={sendMessage} 
+        isProcessing={isThinking || isStreaming} 
+        onSend={streamMessage} 
         onCancel={abortMessage}
       />
     </div>

@@ -1,24 +1,43 @@
-import type { ChatMessageType, AgentMessageType } from "../types";
+import type { ChatMessageType } from "../types";
 
-async function sendMessageAsync(
+async function runMessageStream(
   sessionId: string | null, 
   message: ChatMessageType, 
-  signal: AbortSignal
-): Promise<AgentMessageType> {
+  signal: AbortSignal,
+  dispatch: (event: string, data: string) => void
+): Promise<void> {
 
-  const response = await fetch(`/.netlify/functions/processMessage`, {
+  const res = await fetch(`/.netlify/functions/streamMessage`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { accept: "text/event-stream" },
     body: JSON.stringify({ sessionId, message }),
     signal
   });
 
-  if (!response.ok) {
-    const errText = await response.text()
-    throw new Error(`HTTP ${response.status} ${response.statusText}: ${errText}`);
-  }
+  const decoder = new TextDecoder();
+  const reader = res!.body!.getReader();
 
-  return response.json();
+  let buf = "";
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+
+    buf += decoder.decode(value, { stream: true });
+    const chunks = buf.split("\n\n");
+    buf = chunks.pop()!;
+
+    for (const chunk of chunks) {
+      let event = "";
+      let data  = "";
+
+      for (const line of chunk.split("\n")) {
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) data += line.slice(5);
+      }
+
+      dispatch(event, data);
+    }
+  }
 }
 
-export { sendMessageAsync };
+export { runMessageStream };
