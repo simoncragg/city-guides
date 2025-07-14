@@ -10,11 +10,16 @@ const AgentMessage: React.FC<{ message: AgentMessageType }> = ({ message }) => {
     <div className="flex flex-col md:flex-row gap-1 md:gap-4">
       <AgentAvatar name={message.agent} />
       <div className="flex flex-col gap-2.5 md:gap-1">
-        <span className="text-xs font-semibold">{message.agent}</span>
-        <div className="text-neutral-950 space-y-4" dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }} />
+        <span className="text-xs font-semibold text-center w-[48px] md:text-left md:w-auto">
+          {message.agent}
+        </span>
+        <div 
+          className="text-neutral-950 space-y-4" 
+          dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }}
+        />
       </div>
     </div>
   );
-}
+};
 
 export default AgentMessage;
