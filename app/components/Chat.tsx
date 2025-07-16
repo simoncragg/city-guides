@@ -54,8 +54,13 @@ const Chat: React.FC = () => {
   };
 
   const handleMessageDeltaEvent = (data: string) => {
-    const { content } = JSON.parse(data);
-    updateLastMessage(last => ({ ...last, content: last.content + content, status: "outputting" }));
+    const { agent, content } = JSON.parse(data);
+    updateLastMessage(last => ({ 
+      ...last, 
+      agent, 
+      content: last.content + content, 
+      status: "outputting"
+    }));
   };
 
   const pushMessage = (msg: ChatMessageType | AgentMessageType) => {
