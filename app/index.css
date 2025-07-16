@@ -18,10 +18,3 @@
     }
   }
 }
-
-@layer base {
-
-  ol > li + li {
-    margin-top: 0.5rem;
-  }
-}
