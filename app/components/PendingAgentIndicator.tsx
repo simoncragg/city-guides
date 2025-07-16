@@ -1,46 +1,82 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AgentAvatar from "./AgentAvatar";
+import useImagePreloader from "../hooks/useImagePreloader";
 
-const ROTATION_DURATION_MS = 750;
-const avatars = ["victoria", "augustus", "claude", "marina", "otto"];
+const rotationDurationMs = 750;
+const agents = ["victoria", "augustus", "claude", "marina", "otto"];
 
-const PendingAgentIndicator: React.FC<{ lastAgent: string | undefined }> = ({
-  lastAgent,
-}) => {
+const PendingAgentIndicator: React.FC<{ lastAgent?: string }> = ({ lastAgent }) => {
   const initialAgent = lastAgent?.toLowerCase() || "victoria";
-  const initialIndex = avatars.indexOf(initialAgent);
+  const idx = agents.indexOf(initialAgent);
+  const initialIndex = idx >= 0 ? idx : 0;
+
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [rotation, setRotation] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
+
+  const avatarUrls = agents.map(agent => `/avatars/${agent}-sm-min.png`);
+  const loadedImages = useImagePreloader(avatarUrls);
+
+  const rafIdRef = useRef<number | null>(null);
+  const nextFlipRef = useRef<number>(0);
+  const nextSwapRef = useRef<number>(0);
 
   useEffect(() => {
-    const timeouts: number[] = [];
+    if (!loadedImages) return;
 
-    const intervalId = window.setInterval(() => {
-      setRotation((r) => r + 180);
+    const zoomTimeout = window.setTimeout(() => setZoomed(true), 50);
 
-      timeouts.push(
-        window.setTimeout(() => {
-          setCurrentIndex((i) => (i + 1) % avatars.length);
-        }, ROTATION_DURATION_MS / 2)
-      );
-    }, ROTATION_DURATION_MS);
+    let mounted = true;
+    const start = performance.now();
+    
+    nextFlipRef.current = start + rotationDurationMs;
+    nextSwapRef.current = nextFlipRef.current + rotationDurationMs / 2;
+
+    const animate = (timestamp: number) => {
+      if (!mounted) return;
+
+      if (timestamp >= nextSwapRef.current) {
+        setCurrentIndex(i => (i + 1) % agents.length);
+        nextSwapRef.current += rotationDurationMs;
+      }
+
+      if (timestamp >= nextFlipRef.current) {
+        setRotation(r => r + 180);
+        nextFlipRef.current += rotationDurationMs;
+      }
+
+      rafIdRef.current = requestAnimationFrame(animate);
+    };
+
+    rafIdRef.current = requestAnimationFrame(animate);
 
     return () => {
-      clearInterval(intervalId);
-      timeouts.forEach((t) => clearTimeout(t));
+      mounted = false;
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      clearTimeout(zoomTimeout);
     };
-  }, []);
+  }, [loadedImages]);
+
+  const rotationDurationSecs = (rotationDurationMs / 1000).toFixed(2);
 
   return (
-    <div className="perspective-midrange">
+    <div 
+      role="status"
+      aria-label="Waiting for agent"
+      className="perspective-midrange"
+      style={{
+        transition: `transform 0.2s ease-out`,
+        transform: `scale(${zoomed ? 1 : 0})`,
+      }}
+    >
       <div
         className="w-full h-full transform-3d"
         style={{
-          transition: `transform ${(ROTATION_DURATION_MS / 1000).toFixed(2)}s ease-in-out`,
+          transition: `transform ${rotationDurationSecs}s ease-in-out`,
           transform: `rotateY(${rotation}deg)`,
         }}
       >
-        <AgentAvatar agent={avatars[currentIndex]} grayscale />
+        <AgentAvatar agent={agents[currentIndex]} grayscale />
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ const AgentMessage: React.FC<{ message: AgentMessageType, lastAgent: string | un
         ? <PendingAgentIndicator lastAgent={lastAgent} />
         : <AgentAvatar agent={message.agent!} />
       }
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-2.5 md:gap-1">
         <span className="text-xs font-semibold text-center w-[48px] md:text-left md:w-auto">
           {message.agent}
         </span>
