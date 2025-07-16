@@ -5,6 +5,18 @@
 @theme {
   --font-sans: "Inter", sans-serif;
   --font-serif: "Poppins", serif;
+
+  --animate-busy-pulse: busy-pulse 1s ease-out infinite;
+
+  @keyframes busy-pulse {
+    0%,
+    100% { 
+      transform: scale(.85);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+  }
 }
 
 @layer base {

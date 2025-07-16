@@ -6,5 +6,6 @@ export type ChatMessageType = {
 };
 
 export type AgentMessageType = ChatMessageType & {
-  agent: string;
+  agent?: string;
+  status: "pending" | "thinking" | "outputting" | "done";
 };

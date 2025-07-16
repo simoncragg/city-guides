@@ -109,6 +109,7 @@ function handleRunItemEvent(event: RunItemStreamEvent, ctx: MessageStreamContext
   if (type === "handoff_output_item" && rawItem.status === "completed") {
     ctx.addToHistory(rawItem);
     ctx.setAgent(item.targetAgent.name);
+    ctx.enqueue(`event:message_agent\ndata:${item.targetAgent.name}\n\n`);
   }
 
   if (type === "message_output_item" && rawItem.type === "message" && rawItem.status === "completed") {
