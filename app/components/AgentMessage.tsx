@@ -12,7 +12,7 @@ const AgentMessage: React.FC<{ message: AgentMessageType, lastAgent: string | un
     <div className="flex flex-col md:flex-row gap-1 md:gap-4">
       {message.status === "pending"
         ? <PendingAgentIndicator lastAgent={lastAgent} />
-        : <AgentAvatar agent={message.agent!} />
+        : message.agent && <AgentAvatar agent={message.agent} />
       }
       <div className="flex flex-col gap-2.5 md:gap-1">
         <span className="text-xs font-semibold text-center w-[48px] md:text-left md:w-auto">
