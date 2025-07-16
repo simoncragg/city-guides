@@ -63,7 +63,7 @@ const PendingAgentIndicator: React.FC<{ lastAgent?: string }> = ({ lastAgent }) 
     <div 
       role="status"
       aria-label="Waiting for agent"
-      className="perspective-midrange"
+      className="w-[48px] perspective-midrange"
       style={{
         transition: `transform 0.2s ease-out`,
         transform: `scale(${zoomed ? 1 : 0})`,
