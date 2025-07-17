@@ -50,7 +50,11 @@ const Chat: React.FC = () => {
   };
 
   const handleMessageAgentEvent = (data: string) => {
-    updateLastMessage(last => ({ ...last, agent: data, status: "thinking" }));
+    updateLastMessage(last => ({ 
+      ...last, 
+      agent: data, 
+      status: "thinking"
+    }));
   };
 
   const handleMessageDeltaEvent = (data: string) => {
