@@ -1,11 +1,7 @@
 import { Agent } from "@openai/agents";
 import { RECOMMENDED_PROMPT_PREFIX } from '@openai/agents-core/extensions';
 
-import barcelonaGuide from "./barcelona";
-import berlinGuide from "./berlin";
-import londonGuide from "./london";
-import parisGuide from "./paris";
-import romeGuide from "./rome";
+import cityGuideAgents from "./cityGuideAgents";
 import travelTopicGuardrail from "../guardrails/travelTopicGuardrail";
 
 const instructions = `${RECOMMENDED_PROMPT_PREFIX}
@@ -32,7 +28,7 @@ const silentRouter = new Agent({
   modelSettings: { temperature: 0, toolChoice: "required" },
   instructions,
   inputGuardrails: [travelTopicGuardrail],
-  handoffs: [barcelonaGuide, berlinGuide, londonGuide, parisGuide, romeGuide],
+  handoffs: cityGuideAgents,
 });
 
 export default silentRouter;

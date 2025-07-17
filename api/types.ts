@@ -31,3 +31,22 @@ export type MessageStreamContext = {
 };
 
 export type MessageStreamCompletedCallback = (history: AgentInputItem[], lastAgent: string) => Promise<void>;
+
+/* Google Places API */
+
+export type PlaceType = {
+  id: string;
+  name: string;
+  displayName: {
+    text: string;
+    languageCode: string;
+  };
+  formattedAddress: string;
+  photos: PhotoType[];
+};
+
+export type PhotoType = {
+  name: string;
+  widthPx?: number;
+  heightPx?: number;
+};
