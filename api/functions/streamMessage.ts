@@ -112,6 +112,14 @@ function handleRunItemEvent(event: RunItemStreamEvent, ctx: MessageStreamContext
     ctx.enqueue(`event:message_agent\ndata:${item.targetAgent.name}\n\n`);
   }
 
+  if (type === "tool_call_item" && rawItem.status === "completed") {
+    ctx.addToHistory(event.item.rawItem);
+  }
+
+  if (type === "tool_call_output_item") {
+    ctx.addToHistory(event.item.rawItem);
+  }
+
   if (type === "message_output_item" && rawItem.type === "message" && rawItem.status === "completed") {
     ctx.addToHistory(rawItem);
   }
