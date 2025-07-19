@@ -22,10 +22,13 @@ const AgentMessage: React.FC<{ message: AgentMessageType, lastAgent: string | un
           {
             (message.status === "thinking") 
               ? <ThinkingIndicator />
-              : <div 
-                  className="space-y-2.5 [&_ul>li]:mt-2.5 [&_ol>li]:mt-2.5" 
-                  dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }}
-                />
+              : <>
+                  <div 
+                    className="space-y-2.5 [&_ul>li]:mt-2.5 [&_ol>li]:mt-2.5" 
+                    dangerouslySetInnerHTML={{ __html: marked.parse(message.content) as string }}
+                  />
+                  {message.status === "deferring" && <ThinkingIndicator /> }
+                </>
           }
         </div>
       </div>

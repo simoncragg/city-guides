@@ -7,5 +7,5 @@ export type ChatMessageType = {
 
 export type AgentMessageType = ChatMessageType & {
   agent?: string;
-  status: "pending" | "thinking" | "outputting" | "done";
+  status: "pending" | "thinking" | "outputting" | "deferring" | "done";
 };

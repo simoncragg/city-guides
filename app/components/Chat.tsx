@@ -10,6 +10,8 @@ import { runMessageStream } from "../services/chatService";
 const ABORT_MESSAGE_REASON = "User Cancelled";
 
 const Chat: React.FC = () => {
+
+  const imageMarkdownBuffer = useRef<string>("");
   const abortControllerRef = useRef<AbortController>(new AbortController());
 
   const [sessionId] = useState<string | null>(uuidv4());
@@ -58,13 +60,33 @@ const Chat: React.FC = () => {
   };
 
   const handleMessageDeltaEvent = (data: string) => {
-    const { agent, content } = JSON.parse(data);
+    const { agent, content } = JSON.parse(data) as AgentMessageType;
+    const delta = deferIncompleteImageMarkdown(content);
     updateLastMessage(last => ({ 
       ...last, 
-      agent, 
-      content: last.content + content, 
-      status: "outputting"
+      agent,
+      content: last.content + delta,
+      status: delta.length > 0 ? "outputting" : "deferring",
     }));
+  };
+
+  const deferIncompleteImageMarkdown = (content: string): string => {
+    let delta = "";
+    if (content.startsWith("![") || imageMarkdownBuffer.current.length > 0) {
+      const parts = content.split(")");
+      imageMarkdownBuffer.current += parts[0];
+
+      if (parts.length > 1) {
+        delta += imageMarkdownBuffer.current + ")" + parts[1];
+        imageMarkdownBuffer.current = "";
+      }
+    }
+
+    if (delta === "" && imageMarkdownBuffer.current === "") {
+      delta = content;
+    }
+
+    return delta;
   };
 
   const pushMessage = (msg: ChatMessageType | AgentMessageType) => {
