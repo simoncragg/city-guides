@@ -36,6 +36,10 @@ const Chat: React.FC = () => {
               handleMessageAgentEvent(data);
               break;
 
+            case "message_thinking_status":
+              handleThinkingStatusEvent(data);
+              break;
+
             case "message_delta":
               handleMessageDeltaEvent(data);
               break;
@@ -65,6 +69,13 @@ const Chat: React.FC = () => {
     }));
   };
 
+  const handleThinkingStatusEvent = (data: string) => {
+    updateLastMessage(last => ({ 
+      ...last, 
+      thinkingStatus: data
+    }));
+  };
+
   const handleMessageDeltaEvent = (data: string) => {
     const { agent, content } = JSON.parse(data) as AgentMessageType;
     const delta = deferIncompleteMarkdown(content);
@@ -72,6 +83,7 @@ const Chat: React.FC = () => {
       ...last, 
       agent,
       content: last.content + delta,
+      thinkingStatus: undefined,
       status: delta.length > 0 ? "outputting" : "deferring",
     }));
   };

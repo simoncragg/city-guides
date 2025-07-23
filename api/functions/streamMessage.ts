@@ -1,11 +1,24 @@
-import { AgentInputItem, InputGuardrailTripwireTriggered, run, RunItemStreamEvent, RunRawModelStreamEvent } from "@openai/agents";
+import { 
+  Agent,
+  AgentInputItem,
+  FunctionCallItem,
+  InputGuardrailTripwireTriggered,
+  RunHandoffCallItem,
+  RunItemStreamEvent,
+  RunMessageOutputItem,
+  RunRawModelStreamEvent,
+  RunToolCallItem,
+  RunToolCallOutputItem,
+  protocol,
+  run,
+} from "@openai/agents";
 
 import type { 
   ChatMessage, 
   ChatSession, 
-  StreamMessagePayload, 
+  MessageStreamCompletedCallback,
   MessageStreamContext,
-  MessageStreamCompletedCallback
+  StreamMessagePayload, 
 } from "../types";
 
 import silentRouter from "../agents/silentRouter";
@@ -45,12 +58,15 @@ function buildThread(session: ChatSession, message: ChatMessage): AgentInputItem
   return [...session.messages, message] as AgentInputItem[];
 }
 
-function createSseStream(thread: AgentInputItem[], onStreamCompleted: MessageStreamCompletedCallback, signal: AbortSignal) {
+function createSseStream(
+  thread: AgentInputItem[], 
+  onStreamCompleted: MessageStreamCompletedCallback, signal: AbortSignal
+) {
   return new ReadableStream({
-
     async start(controller) {
       const encoder = new TextEncoder();
       const history = [...thread];
+      const functionCallCounts = new Map<string, number>();
       let lastAgent = "";
       let aborted = false;
 
@@ -60,30 +76,30 @@ function createSseStream(thread: AgentInputItem[], onStreamCompleted: MessageStr
         finally { controller.close(); }
       }, { once: true });
 
-      try {
-        const ctx: MessageStreamContext = {
-          addToHistory: item => history.push(item),
-          setAgent: name => lastAgent = name,
-          getAgent: () => lastAgent,
-          enqueue: chunk => controller.enqueue(encoder.encode(chunk)),
-        };
+      const ctx: MessageStreamContext = {
+        addToHistory: item => history.push(item),
+        setAgent: name => lastAgent = name,
+        getAgent: () => lastAgent,
+        getFunctionCallCount: (fn) => functionCallCounts.get(fn) ?? 0,
+        setFunctionCallCount: (fn, value) => functionCallCounts.set(fn, value),
+        enqueue: chunk => controller.enqueue(encoder.encode(chunk)),
+      };
 
+      try {
         const result = await run(silentRouter, thread, { 
           stream: true, 
           signal
         });
 
         for await (const event of result) {
-          if (event.type === "run_item_stream_event") {
-            handleRunItemEvent(event, ctx);
-          }
-          if (event.type === "raw_model_stream_event") {
-            handleRawModelEvent(event, ctx);
+          switch (event.type) {
+            case "run_item_stream_event": handleRunItemEvent(event, ctx); break;
+            case "raw_model_stream_event": handleRawModelEvent(event, ctx);
           }
         }
       } catch (error: unknown) {
         if (error instanceof InputGuardrailTripwireTriggered) {
-          controller.enqueue(`event:message_delta\ndata:{ "content": "Sorry, we can only assist with city breaks.", "agent": "Victoria" }\n\n`);
+          handleInputGuardrailTripwireTrigger(ctx);
         } else {
           controller.error(error);
           console.error(error);
@@ -100,27 +116,73 @@ function createSseStream(thread: AgentInputItem[], onStreamCompleted: MessageStr
 
 function handleRunItemEvent(event: RunItemStreamEvent, ctx: MessageStreamContext) {
   const { item } = event;
-  const { type, rawItem } = item;
-
-  if (type === "handoff_call_item" && rawItem.status === "completed") {
-    ctx.addToHistory(event.item.rawItem);
+  switch (item.type) {
+    case "handoff_call_item": handleHandoffCallItem(item, ctx); break;
+    case "handoff_output_item": handleHandoffOutputItem(item, ctx); break;
+    case "tool_call_item": handleToolCallItem(item, ctx); break;
+    case "tool_call_output_item": handleToolCallOutputItem(item, ctx); break;
+    case "message_output_item": handleMessageOutputItem(item, ctx); break;
   }
+}
 
-  if (type === "handoff_output_item" && rawItem.status === "completed") {
-    ctx.addToHistory(rawItem);
+function handleHandoffCallItem(item: RunHandoffCallItem, ctx: MessageStreamContext) {
+  if (item.rawItem.status === "completed") {
+    ctx.addToHistory(item.rawItem);
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RunHandoffOutputItem = { rawItem: protocol.FunctionCallResultItem, targetAgent: Agent<any, any> };
+
+function handleHandoffOutputItem(item: RunHandoffOutputItem, ctx: MessageStreamContext) {
+  if (item.rawItem.status === "completed") {
+    ctx.addToHistory(item.rawItem);
     ctx.setAgent(item.targetAgent.name);
     ctx.enqueue(`event:message_agent\ndata:${item.targetAgent.name}\n\n`);
   }
+}
 
-  if (type === "tool_call_item" && rawItem.status === "completed") {
-    ctx.addToHistory(event.item.rawItem);
+function handleToolCallItem({ rawItem }: RunToolCallItem, ctx: MessageStreamContext) {
+  if (rawItem.type === "function_call") {
+    handleFunctionCall(rawItem, ctx);
   }
-
-  if (type === "tool_call_output_item") {
-    ctx.addToHistory(event.item.rawItem);
+  
+  if (rawItem.status === "completed") {
+    ctx.addToHistory(rawItem);
   }
+}
 
-  if (type === "message_output_item" && rawItem.type === "message" && rawItem.status === "completed") {
+function handleToolCallOutputItem({ rawItem }: RunToolCallOutputItem, ctx: MessageStreamContext) {
+  if (rawItem.type === "function_call_result" && rawItem.status === "completed") {
+    ctx.addToHistory(rawItem);
+  }
+}
+
+function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContext) {
+  const trackAndReport = (
+    key: "get_place" | "get_photo_uri",
+    singular: string,
+    verb: string
+  ) => {
+    const count = ctx.getFunctionCallCount(key);
+    ctx.setFunctionCallCount(key, count + 1);
+
+    const subject = count > 0 ? `${singular}s` : singular;
+    ctx.enqueue(`event:message_thinking_status\ndata:${verb} ${subject}\n\n`);
+  };
+
+  switch (name) {
+    case "get_place": 
+      trackAndReport("get_place", "location", "Researching");
+      break;
+    case "get_photo_uri":
+      trackAndReport("get_photo_uri", "photo", "Getting");
+      break;
+  }
+}
+
+function handleMessageOutputItem({ rawItem }: RunMessageOutputItem, ctx: MessageStreamContext) {
+  if (rawItem.type === "message" && rawItem.status === "completed") {
     ctx.addToHistory(rawItem);
   }
 }
@@ -131,6 +193,14 @@ function handleRawModelEvent(event: RunRawModelStreamEvent, ctx: MessageStreamCo
     //console.log(`>${delta}<`);
     ctx.enqueue(`event:message_delta\ndata:{ "content": "${delta}", "agent": "${ctx.getAgent()}" }\n\n`);
   }
+}
+
+function handleInputGuardrailTripwireTrigger(ctx: MessageStreamContext) {
+  const data = {
+    content: "Sorry, we can only assist with city breaks.",
+    agent: ctx.getAgent() ?? "Victoria"
+  };
+  ctx.enqueue(`event:message_delta\ndata:${JSON.stringify(data)}\n\n`);
 }
 
 export default streamMessage;

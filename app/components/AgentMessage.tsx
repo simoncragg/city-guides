@@ -5,11 +5,14 @@ import AgentAvatar from "./AgentAvatar";
 import PendingAgentIndicator from "./PendingAgentIndicator";
 import ThinkingIndicator from "./ThinkingIndicator";
 import { marked } from "marked";
+import { TextShimmer } from "./TextShimmer";
 
-const AgentMessage: React.FC<{
+interface Props {
   message: AgentMessageType;
   lastAgent: string | undefined;
-}> = ({ message, lastAgent }) => {
+}
+
+const AgentMessage: React.FC<Props> = ({ message, lastAgent }) => {
   return (
     <div className="flex flex-col md:flex-row gap-1 md:gap-4">
       {message.status === "pending" ? (
@@ -17,6 +20,7 @@ const AgentMessage: React.FC<{
       ) : (
         message.agent && <AgentAvatar agent={message.agent} />
       )}
+
       <div className="flex flex-col gap-2.5 md:gap-1">
         <span className="text-xs font-semibold text-center w-[48px] md:text-left md:w-auto">
           {message.agent}
@@ -25,17 +29,21 @@ const AgentMessage: React.FC<{
         <div className="text-neutral-950">
           <span
             className={`
-              [&_ul>li]:mt-2.5 [&_ol>li]:mt-2.5
-              [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-6
-              [&_p]:inline [&_p]:m-0
-              [&_a]:text-sky-800
-              [&_img]:rounded-xl [&_img]:mt-4 [&_img]:mb-8
+              [&_ul]:mb-4 [&_ol]:mb-4
+              [&_ul>li]:mt-4 [&_ol>li]:mt-4
+              [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2.5
+              [&_p]:inline
+            [&_a]:text-sky-800
+              [&_img]:rounded-xl [&_img]:my-4
             `}
             dangerouslySetInnerHTML={{
               __html: marked.parse(message.content) as string,
             }}
           />
-          {(message.status === "thinking" || message.status === "deferring") && <ThinkingIndicator />}
+          {message.thinkingStatus
+            ? <p><TextShimmer>{message.thinkingStatus}</TextShimmer></p>
+            : (message.status === "thinking" || message.status === "deferring") && <ThinkingIndicator />
+          }
         </div>
       </div>
     </div>

@@ -38,7 +38,7 @@ const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isProcessing, onSend, 
           aria-label="Ask anything"
           placeholder="Ask anything"
           rows={2}
-          className="w-full px-4 py-3 rounded-3xl border border-gray-200 bg-gray-50 text-neutral-950 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-400"
+          className="w-full px-4 py-3 rounded-3xl border border-gray-200 bg-gray-50/75 backdrop-blur-xl text-neutral-950 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-400"
           autoFocus
         />
         <button

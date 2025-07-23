@@ -27,6 +27,8 @@ export type MessageStreamContext = {
   addToHistory: (item: AgentInputItem) => void;
   getAgent: () => string | undefined;
   setAgent: (name: string) => void;
+  getFunctionCallCount: (fn: string) => number,
+  setFunctionCallCount: (fn: string, value: number) => void,
   enqueue: (chunk: string) => void;
 };
 
