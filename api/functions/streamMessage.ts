@@ -159,7 +159,7 @@ function handleToolCallOutputItem({ rawItem }: RunToolCallOutputItem, ctx: Messa
 }
 
 function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContext) {
-  const trackAndReport = (
+  const trackAndSend = (
     key: "get_place" | "get_photo_uri",
     singular: string,
     verb: string
@@ -173,10 +173,10 @@ function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContex
 
   switch (name) {
     case "get_place": 
-      trackAndReport("get_place", "location", "Researching");
+      trackAndSend("get_place", "location", "Researching");
       break;
     case "get_photo_uri":
-      trackAndReport("get_photo_uri", "photo", "Getting");
+      trackAndSend("get_photo_uri", "photo", "Getting");
       break;
   }
 }
