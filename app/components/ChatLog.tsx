@@ -9,10 +9,15 @@ interface ChatLogProps {
 }
 
 const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
-  const bottomRef = useRef<HTMLLIElement>(null);
+  const lastMessageRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = lastMessageRef.current;
+    if (el) {
+      const offset = 16;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
   }, [messages]);
 
   let currentAgent: string | undefined;
@@ -26,8 +31,13 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
           currentAgent = (message as AgentMessageType).agent;
         }
 
+        const isLast = idx === messages.length - 1;
+
         return (
-          <li key={idx} className="grid items-start gap-2">
+          <li 
+            key={idx} 
+            ref={isLast ? lastMessageRef : null}
+            className="grid items-start gap-2">
             {message.role === "user" ? (
               <UserMessage message={message} />
             ) : (
@@ -39,7 +49,6 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
           </li>
         );
       })}
-      <li ref={bottomRef} />
     </ul>
   );
 };
