@@ -30,6 +30,13 @@ const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isProcessing, onSend, 
     }
   };
 
+  const handleKeypress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!isProcessing && e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleActionButtonClick();
+    }
+  };
+
   return (
     <div className={`fixed inset-x-0 p-4 ${pinToBottom ? "bottom-0" : "bottom-1/2 translate-y-1/2"} transition-all duration-300 ease-in-out`}>
       <div className="max-w-md mx-auto relative">
@@ -40,6 +47,7 @@ const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isProcessing, onSend, 
           rows={2}
           className="w-full pr-14 pl-4 py-3 rounded-3xl border border-gray-200 bg-gray-50/75 backdrop-blur-xl text-neutral-950 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-400"
           autoFocus
+          onKeyDown={handleKeypress}
         />
         <button
           type="button"
