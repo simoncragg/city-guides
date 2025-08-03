@@ -41,7 +41,7 @@ const AgentMessage: React.FC<Props> = ({ message, lastAgent }) => {
             }}
           />
           {message.thinkingStatus
-            ? <p><TextShimmer>{message.thinkingStatus}</TextShimmer></p>
+            ? <TextShimmer>{message.thinkingStatus}</TextShimmer>
             : (message.status === "thinking" || message.status === "deferring") && <ThinkingIndicator />
           }
         </div>
