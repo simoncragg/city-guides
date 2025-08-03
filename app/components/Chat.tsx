@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import type { AgentMessageType, ChatMessageType } from "../types";
 
 import ChatLog from "./ChatLog";
-import InputBox from "./InputBox";
+import GreetingCard from "./GreetingCard";
+import InputBox, { type InputBoxHandle } from "./InputBox";
 import useMarkdownDeferrer from "../hooks/useMarkdownDeferrer";
 import { runMessageStream } from "../services/chatService";
 
@@ -14,10 +15,12 @@ const Chat: React.FC = () => {
 
   const { deferIncompleteMarkdown, flush } = useMarkdownDeferrer(); 
   const abortControllerRef = useRef<AbortController>(new AbortController());
+  const inputBoxHandle = useRef<InputBoxHandle>(null);
 
   const [sessionId] = useState<string | null>(uuidv4());
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [showGreetingCard, setShowGreetingCard] = useState<boolean>(true);
 
   const streamMessage = async (userMessage: ChatMessageType) => {
     setIsProcessing(true);
@@ -107,16 +110,38 @@ const Chat: React.FC = () => {
     setIsProcessing(false);
   };
 
+  const onSuggestionClicked = (suggestion: string) => {
+    setShowGreetingCard(false);
+    requestAnimationFrame(() => inputBoxHandle.current?.focus());
+    streamMessage({ role: "user", content: suggestion});
+  };
+
+  const onGreetingCardDismissed = () => {
+    setShowGreetingCard(false);
+    requestAnimationFrame(() => inputBoxHandle.current?.focus());
+  };
+
   return (
-    <div className="m-2 md:m-4 pb-24">
-      <ChatLog messages={messages} />
-      <InputBox
-        pinToBottom={messages.length > 0}
-        isProcessing={isProcessing}
-        onSend={streamMessage}
-        onCancel={abortMessage}
-      />
-    </div>
+    <>
+      {showGreetingCard && (
+        <GreetingCard
+          onSuggestionClicked={onSuggestionClicked} 
+          onDismiss={onGreetingCardDismissed}
+        />
+      )}
+    
+      <div className="m-2 md:m-4 pb-24">
+      
+        <ChatLog messages={messages} />
+        <InputBox
+          ref={inputBoxHandle}
+          pinToBottom={messages.length > 0 || showGreetingCard}
+          isProcessing={isProcessing}
+          onSend={streamMessage}
+          onCancel={abortMessage}
+        />
+      </div>
+    </>
   );
 };
 

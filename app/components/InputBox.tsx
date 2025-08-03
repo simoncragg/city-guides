@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import { FaArrowUp, FaStop } from "react-icons/fa6";
 
 import type { ChatMessageType } from "../types";
@@ -11,9 +11,18 @@ interface InputBoxProps {
   onCancel: () => void;
 }
 
-const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isProcessing, onSend, onCancel }) => {
+export type InputBoxHandle = {
+  focus: () => void;
+};
 
+const InputBox = forwardRef<InputBoxHandle, InputBoxProps>((props, ref) => {
+
+  const { pinToBottom, isProcessing, onSend, onCancel } = props;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => textareaRef.current?.focus(),
+  }));
 
   const handleActionButtonClick = () => {
 
@@ -46,7 +55,6 @@ const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isProcessing, onSend, 
           placeholder="Ask anything"
           rows={2}
           className="w-full pr-14 pl-4 py-3 rounded-3xl border border-gray-200 bg-gray-50/75 backdrop-blur-xl text-neutral-950 shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-sky-400"
-          autoFocus
           onKeyDown={handleKeypress}
         />
         <button
@@ -60,6 +68,6 @@ const InputBox: React.FC<InputBoxProps> = ({ pinToBottom, isProcessing, onSend, 
       </div>
     </div>
   );
-};
+});
 
 export default InputBox;
