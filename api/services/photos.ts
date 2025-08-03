@@ -1,40 +1,41 @@
 const apiBaseUrl = process.env.GOOGLE_PLACES_API_BASEURL;
 const apiKey = process.env.GOOGLE_PLACES_API_KEY as string;
 
+const mediaQuery = new URLSearchParams({
+  maxHeightPx: "400",
+  maxWidthPx: "400",
+  skipHttpRedirect: "true",
+}).toString();
+
 export async function getPhotoUriAsync(photoName: string): Promise<string | null> {
   
-  const mediaUrl =
-    `${apiBaseUrl}/${photoName}/media` +
-    `?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true`;
-
-  console.log("DEBUG 1");
+  const mediaUrl = buildMediaUrl(photoName);
+  let res: Response;
 
   try {
-    const res = await fetch(mediaUrl, {
+    res = await fetch(mediaUrl.href, {
       headers: {
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask": "photoUri",
       },
     });
-
-    console.log("DEBUG 2");
-
-    if (!res.ok) {
-      const msg = "Image retrieval failed";
-      console.error(msg, await res.text());
-      throw new Error(`${msg}: ${res.status}`);
-    }
-
-    const { photoUri } = await res.json() as { photoUri: string };
-
-    return photoUri
-      ? photoUri
-      : null;
   }
   catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error("Photos error: " + err.message);
-    }
-    throw err;
+    throw new Error(
+      `Network error fetching ${mediaUrl}: ${(err as Error)?.message ?? err}`,
+      { cause: err }
+    );
   }
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Image retrieval failed (${res.status}): ${body}`);
+  }
+
+  const { photoUri } = (await res.json()) as { photoUri?: string };
+  return photoUri ?? null;
+}
+
+function buildMediaUrl(photoName: string): URL {
+  return new URL(`${apiBaseUrl}/${photoName}/media?${mediaQuery}`);
 }
