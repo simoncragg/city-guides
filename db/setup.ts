@@ -5,10 +5,12 @@ config();
 
 const sql = neon();
 
-await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
+await sql`
+  CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+`;
 
 await sql`
-  DROP TABLE chat_session;
+  DROP TABLE IF EXISTS chat_session;
 `;
 
 await sql`
@@ -17,6 +19,18 @@ await sql`
     messages   JSONB       NOT NULL DEFAULT '[]',
     last_agent VARCHAR(30) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+`;
+
+await sql`
+  DROP TABLE IF EXISTS cache_item;
+`;
+
+await sql`
+  CREATE TABLE cache_item (
+    key          TEXT PRIMARY KEY,
+    value        JSONB         NOT NULL,
+    stale_at     TIMESTAMPTZ   NOT NULL
   );
 `;
 

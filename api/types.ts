@@ -52,3 +52,17 @@ export type PhotoType = {
   widthPx?: number;
   heightPx?: number;
 };
+
+/* Cache Item */
+
+export type CacheItemRow<T = unknown> = {
+  key: string;
+  value: T;
+  stale_at: string;
+};
+
+export type CacheItem<T = unknown> = {
+  key: string;
+  value: T;
+  staleAt: Date;
+};

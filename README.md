@@ -56,14 +56,10 @@ Each city guide agent can embellish their responses with links and photos using 
 npm i
 ```
 
-### Setup the `chat_session` database table
+### Setup database
 
 ```bash
-# From the project root, change directory to `db`
-cd db
-
-# Run the DB setup utility script
-node setup.ts
+npm run db:setup
 ```
 
 ### Run the app

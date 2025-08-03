@@ -1,6 +1,6 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
-import { getPhotoUriAsync } from "../services/places";
+import { getPhotoUriAsync } from "../services/photos";
 
 const getPhotoUriTool = tool({
   name: "get_photo_uri",
@@ -12,7 +12,11 @@ const getPhotoUriTool = tool({
       .describe("Photo resource name from place.photos[].name, e.g. 'places/ChIJ.../photos/ATJ...'."),
   }),
   async execute({ photoName }) {
-    return getPhotoUriAsync(photoName);
+    const key = photoName.substring(30, 10);
+    console.time(key);
+    const result = await getPhotoUriAsync(photoName);
+    console.timeEnd(key);
+    return result;
   },
 });
 

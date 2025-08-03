@@ -1,15 +1,44 @@
 import type { PlaceType } from "../types";
+import { getByKey, upsertCacheItem } from "../db/cacheItem";
 
-const API_ROOT = "https://places.googleapis.com/v1";
-const API_KEY = process.env.GOOGLE_API_KEY as string;
+const apiBaseUrl = process.env.GOOGLE_PLACES_API_BASEURL;
+const apiKey = process.env.GOOGLE_PLACES_API_KEY as string;
+const cacheKeyPrefix = "place::";
+const cacheDurationMs = 1000 * 60 * 60 * 24 * 30;
 
 export async function getPlaceAsync(textQuery: string): Promise<PlaceType | null> {
 
-  const res = await fetch(`${API_ROOT}/places:searchText`, {
+  const place = await getFromCache(textQuery);
+  return place
+    ? place
+    : fetchAndCache(textQuery);
+}
+
+async function getFromCache(textQuery: string): Promise<PlaceType | null> {
+  const cacheKey = cacheKeyPrefix + textQuery;
+  const cacheItem = await getByKey(cacheKey);
+  if (cacheItem) {
+    console.log({
+      cacheItem: { cacheItem }, 
+      now: Date.now(), 
+      staleAt: cacheItem.staleAt.getTime()
+    });
+  }
+
+  if (cacheItem && Date.now() < cacheItem.staleAt.getTime()) {
+    console.log("USING CACHE ITEM");
+    return cacheItem.value as PlaceType;
+  }
+
+  return null;
+}
+
+async function fetchAndCache(textQuery: string): Promise<PlaceType | null> {
+  const res = await fetch(`${apiBaseUrl}/places:searchText`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Goog-Api-Key": API_KEY,
+      "X-Goog-Api-Key": apiKey,
       "X-Goog-FieldMask": [
         "places.id",
         "places.displayName",
@@ -21,34 +50,18 @@ export async function getPlaceAsync(textQuery: string): Promise<PlaceType | null
   });
 
   const { places } = await res.json();
-  
-  return (places && places.length > 0)
-    ? places[0]
-    : null;
-}
 
-export async function getPhotoUriAsync(photoName: string): Promise<string | null> {
-  
-  const mediaUrl =
-    `${API_ROOT}/${photoName}/media` +
-    `?maxHeightPx=400&maxWidthPx=400&skipHttpRedirect=true`;
+  const place = (places?.length > 0)
+  ? places[0]
+  : null;
 
-  const res = await fetch(mediaUrl, {
-    headers: {
-      "X-Goog-Api-Key": API_KEY,
-      "X-Goog-FieldMask": "photoUri",
-    },
-  });
-
-  if (!res.ok) {
-    const msg = "Image retrieval failed";
-    console.error(msg, await res.text());
-    throw new Error(`${msg}: ${res.status}`);
+  if (place) {
+    await upsertCacheItem({ 
+      key: cacheKeyPrefix + textQuery, 
+      value: place, 
+      staleAt: new Date(Date.now() + cacheDurationMs),
+    });
   }
 
-  const { photoUri } = await res.json() as { photoUri: string };
-
-  return photoUri
-    ? photoUri
-    : null;
+  return place;
 }
