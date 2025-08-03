@@ -3,7 +3,6 @@ import { getByKey, upsertCacheItem } from "../db/cacheItem";
 
 const apiBaseUrl = process.env.GOOGLE_PLACES_API_BASEURL;
 const apiKey = process.env.GOOGLE_PLACES_API_KEY as string;
-const cacheKeyPrefix = "place::";
 const cacheDurationMs = 1000 * 60 * 60 * 24 * 30;
 
 export async function getPlaceAsync(textQuery: string): Promise<PlaceType | null> {
@@ -15,14 +14,13 @@ export async function getPlaceAsync(textQuery: string): Promise<PlaceType | null
 }
 
 async function getFromCache(textQuery: string): Promise<PlaceType | null> {
-  const cacheKey = cacheKeyPrefix + textQuery;
+  const cacheKey = buildCacheKey(textQuery);
   const cacheItem = await getByKey(cacheKey);
+  const isValid = cacheItem && Date.now() < cacheItem.staleAt.getTime();
 
-  if (cacheItem && Date.now() < cacheItem.staleAt.getTime()) {
-    return cacheItem.value as PlaceType;
-  }
-
-  return null;
+  return isValid
+    ? cacheItem.value as PlaceType
+    : null;
 }
 
 async function fetchAndCache(textQuery: string): Promise<PlaceType | null> {
@@ -48,12 +46,16 @@ async function fetchAndCache(textQuery: string): Promise<PlaceType | null> {
   : null;
 
   if (place) {
-    await upsertCacheItem({ 
-      key: cacheKeyPrefix + textQuery, 
-      value: place, 
+    await upsertCacheItem({
+      key: buildCacheKey(textQuery),
+      value: place,
       staleAt: new Date(Date.now() + cacheDurationMs),
     });
   }
 
   return place;
+}
+
+function buildCacheKey(textQuery: string): string {
+  return "place::" + textQuery;
 }
