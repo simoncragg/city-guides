@@ -12,10 +12,7 @@ const getPlaceTool = tool({
       .describe("Natural-language place description, e.g. 'Eiffel Tower, Paris' or 'Louvre Museum, Paris, France'."),
   }),
   async execute({ query }) {
-    console.time(query);
-    const result = await getPlaceAsync(query);
-    console.timeEnd(query);
-    return result;
+    return await getPlaceAsync(query);
   },
 });
 

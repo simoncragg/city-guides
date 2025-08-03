@@ -17,16 +17,8 @@ export async function getPlaceAsync(textQuery: string): Promise<PlaceType | null
 async function getFromCache(textQuery: string): Promise<PlaceType | null> {
   const cacheKey = cacheKeyPrefix + textQuery;
   const cacheItem = await getByKey(cacheKey);
-  if (cacheItem) {
-    console.log({
-      cacheItem: { cacheItem }, 
-      now: Date.now(), 
-      staleAt: cacheItem.staleAt.getTime()
-    });
-  }
 
   if (cacheItem && Date.now() < cacheItem.staleAt.getTime()) {
-    console.log("USING CACHE ITEM");
     return cacheItem.value as PlaceType;
   }
 

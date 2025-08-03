@@ -12,11 +12,7 @@ const getPhotoUriTool = tool({
       .describe("Photo resource name from place.photos[].name, e.g. 'places/ChIJ.../photos/ATJ...'."),
   }),
   async execute({ photoName }) {
-    const key = photoName.substring(30, 10);
-    console.time(key);
-    const result = await getPhotoUriAsync(photoName);
-    console.timeEnd(key);
-    return result;
+    return await getPhotoUriAsync(photoName);
   },
 });
 
