@@ -7,7 +7,7 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ customClasses = "" }) => {
   return (
-    <div className={`flex flex-col items-center ${customClasses}`}>
+    <div className={`flex flex-col items-center pb-8 ${customClasses}`}>
       <img 
         src={`${import.meta.env.VITE_PUBLIC_URL}/logo-min.png`} 
         className="text-9xl mb-3 md:max-w-[600px]"
