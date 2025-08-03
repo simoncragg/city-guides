@@ -66,7 +66,6 @@ function createSseStream(
     async start(controller) {
       const encoder = new TextEncoder();
       const history = [...thread];
-      const functionCallCounts = new Map<string, number>();
       let lastAgent = "";
       let aborted = false;
 
@@ -80,8 +79,6 @@ function createSseStream(
         addToHistory: item => history.push(item),
         setAgent: name => lastAgent = name,
         getAgent: () => lastAgent,
-        getFunctionCallCount: (fn) => functionCallCounts.get(fn) ?? 0,
-        setFunctionCallCount: (fn, value) => functionCallCounts.set(fn, value),
         enqueue: chunk => controller.enqueue(encoder.encode(chunk)),
       };
 
@@ -159,24 +156,13 @@ function handleToolCallOutputItem({ rawItem }: RunToolCallOutputItem, ctx: Messa
 }
 
 function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContext) {
-  const trackAndSend = (
-    key: "get_place" | "get_photo_uri",
-    singular: string,
-    verb: string
-  ) => {
-    const count = ctx.getFunctionCallCount(key);
-    ctx.setFunctionCallCount(key, count + 1);
-
-    const subject = count > 0 ? `${singular}s` : singular;
-    ctx.enqueue(`event:message_thinking_status\ndata:${verb} ${subject}\n\n`);
-  };
-
+  const enqueue = (data: string) => ctx.enqueue(`event:message_thinking_status\ndata:${data}\n\n`);
   switch (name) {
     case "get_place": 
-      trackAndSend("get_place", "location", "Researching");
+      enqueue("Retrieving location info");
       break;
     case "get_photo_uri":
-      trackAndSend("get_photo_uri", "photo", "Getting");
+      enqueue("Retrieving photos");
       break;
   }
 }
