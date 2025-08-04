@@ -136,7 +136,6 @@ const Chat: React.FC = () => {
         <ChatLog messages={messages} />
         <InputBox
           ref={inputBoxHandle}
-          pinToBottom={messages.length > 0 || showGreetingCard}
           isProcessing={isProcessing}
           onSend={streamMessage}
           onCancel={abortMessage}

@@ -5,7 +5,6 @@ import type { ChatMessageType } from "../types";
 import { buildUserMessage } from "../builders/messageBuilder";
 
 interface InputBoxProps {
-  pinToBottom: boolean;
   isProcessing: boolean;
   onSend: (message: ChatMessageType) => void;
   onCancel: () => void;
@@ -17,7 +16,7 @@ export type InputBoxHandle = {
 
 const InputBox = forwardRef<InputBoxHandle, InputBoxProps>((props, ref) => {
 
-  const { pinToBottom, isProcessing, onSend, onCancel } = props;
+  const { isProcessing, onSend, onCancel } = props;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useImperativeHandle(ref, () => ({
@@ -47,7 +46,7 @@ const InputBox = forwardRef<InputBoxHandle, InputBoxProps>((props, ref) => {
   };
 
   return (
-    <div className={`fixed inset-x-0 p-4 ${pinToBottom ? "bottom-0" : "bottom-1/2 translate-y-1/2"} transition-all duration-300 ease-in-out`}>
+    <div className="fixed inset-x-0 p-4 bottom-0">
       <div className="max-w-md mx-auto relative">
         <textarea
           ref={textareaRef}
