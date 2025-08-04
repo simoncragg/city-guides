@@ -123,7 +123,7 @@ const Chat: React.FC = () => {
         <GreetingCard onSuggestionClicked={onSuggestionClicked} />
       )}
     
-      <div className="m-2 md:m-4 pb-24">
+      <div className="mx-2 md:mx-4 mt-16">
       
         <ChatLog messages={messages} />
         <InputBox
