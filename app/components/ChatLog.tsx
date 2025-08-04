@@ -8,35 +8,48 @@ interface ChatLogProps {
   messages: ChatMessageType[];
 }
 
+const TALL_MESSAGE_THRESHOLD = 0.3;
+const SCROLL_MARGIN_TOP_SM = 16
+const SCROLL_MARGIN_TOP_LG = 48;
+
 const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
-  const lastMessageRef = useRef<HTMLLIElement>(null);
+  const lastUserMessageRef = useRef<HTMLLIElement>(null);
+
+  const lastUserIndex = messages.reduce<number>(
+    (prev, msg, i) => (msg.role === "user" ? i : prev),
+    -1
+  );
 
   useEffect(() => {
-    const el = lastMessageRef.current;
+    if (lastUserIndex < 0 || !lastUserMessageRef.current) return;
+
+    const el = lastUserMessageRef.current;
+    const isTall = el.offsetHeight > window.innerHeight * TALL_MESSAGE_THRESHOLD;
+    const offset = isTall ? 0 - el.offsetHeight + SCROLL_MARGIN_TOP_LG : SCROLL_MARGIN_TOP_SM;
+
     if (el) {
-      const offset = 16;
       const top = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top, behavior: "smooth" });
     }
-  }, [messages]);
+  }, [lastUserIndex]);
 
   let currentAgent: string | undefined;
 
   return (
-    <ul className="grid gap-10 md:gap-16 relative">
+    <ul className={`grid gap-10 md:gap-16 relative ${messages.length > 0 ? "mb-[90vh]" : ""}`}>
+
       {messages.map((message, idx) => {
         const lastAgent = currentAgent;
+        const isLastUserMessage = idx === lastUserIndex;
 
         if (message.role === "assistant") {
           currentAgent = (message as AgentMessageType).agent;
         }
 
-        const isLast = idx === messages.length - 1;
-
         return (
           <li 
             key={idx} 
-            ref={isLast ? lastMessageRef : null}
+            ref={isLastUserMessage ? lastUserMessageRef : null}
             className="grid items-start gap-2">
             {message.role === "user" ? (
               <UserMessage message={message} />
