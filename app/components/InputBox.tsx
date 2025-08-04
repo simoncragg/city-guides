@@ -49,6 +49,7 @@ const InputBox = forwardRef<InputBoxHandle, InputBoxProps>((props, ref) => {
     <div className="fixed inset-x-0 p-4 bottom-0">
       <div className="max-w-md mx-auto relative">
         <textarea
+          id="input-textarea"
           ref={textareaRef}
           aria-label="Ask anything"
           placeholder="Ask anything"
