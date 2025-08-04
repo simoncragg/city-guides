@@ -36,7 +36,7 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
   let currentAgent: string | undefined;
 
   return (
-    <ul className={`grid gap-10 md:gap-16 relative ${messages.length > 0 ? "mb-[90vh]" : ""}`}>
+    <div className={`grid gap-10 md:gap-16 relative ${messages.length > 0 ? "mb-[90vh]" : ""}`}>
 
       {messages.map((message, idx) => {
         const lastAgent = currentAgent;
@@ -47,7 +47,7 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
         }
 
         return (
-          <li 
+          <article 
             key={idx} 
             ref={isLastUserMessage ? lastUserMessageRef : null}
             className="grid items-start gap-2">
@@ -59,10 +59,10 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
                 lastAgent={lastAgent}
               />
             )}
-          </li>
+          </article>
         );
       })}
-    </ul>
+    </div>
   );
 };
 
