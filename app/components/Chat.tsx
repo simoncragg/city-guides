@@ -24,6 +24,7 @@ const Chat: React.FC = () => {
 
   const streamMessage = async (userMessage: ChatMessageType) => {
     setIsProcessing(true);
+    setShowGreetingCard(false);
     pushMessage(userMessage);
 
     try {
