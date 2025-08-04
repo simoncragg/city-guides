@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface GreetingCardProps {
   onSuggestionClicked: (suggestion: string) => void;
-  onDismiss: () => void;
 }
 
 const suggestions = [
@@ -11,46 +10,28 @@ const suggestions = [
   "Hidden jazz bars in Rome"
 ];
 
-const GreetingCard: React.FC<GreetingCardProps> = ({ onSuggestionClicked, onDismiss }) => {
-
-  const [visible, setVisible] = useState(true);
-
-  const dismiss = () => {
-    setVisible(false);
-    setTimeout(() => onDismiss(), 300);
-  };
+const GreetingCard: React.FC<GreetingCardProps> = ({ onSuggestionClicked }) => {
 
   return (
     <div
       className={`
-        -mt-16 
-        md:mx-auto 
+        flex flex-col items-center gap-6
+        mx-auto 
         px-4 md:px-6 
         pt-4 pb-6
         w-full md:max-w-screen-sm 
-        rounded-lg 
-        bg-gray-50 border border-gray-200 drop-shadow-md 
-        ${visible ? "animate-fade-in" : "animate-fade-out"}
-        `.trim()
-      }
+        rounded-md
+      `}
       role="dialog"
       aria-labelledby="greeting-title"
     >
-      <button
-        type="button"
-        aria-label="Dismiss greeting panel"
-        className="absolute p-3 right-1 top-1 text-2xl text-gray-500 leading-6 focus:outline-none hover:cursor-pointer"
-        onClick={dismiss}
-      >
-        ×
-      </button>
-      <h2 id="greeting-title" className="mb-4 text-lg font-semibold">
+      <h2 id="greeting-title" className="text-lg font-semibold">
         👋 Planning a trip?
       </h2>
-      <p className="mb-5 text-md leading-5">
+      <p className="mb-1 text-md leading-5 text-center">
         Talk to our local experts for London, Paris, Rome, Berlin or Barcelona.
       </p>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-4 justify-center">
         {suggestions.map(
           suggestion => (
             <button

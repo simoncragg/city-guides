@@ -113,22 +113,14 @@ const Chat: React.FC = () => {
 
   const onSuggestionClicked = (suggestion: string) => {
     setShowGreetingCard(false);
-    requestAnimationFrame(() => inputBoxHandle.current?.focus());
+    inputBoxHandle.current?.focus();
     streamMessage({ role: "user", content: suggestion});
-  };
-
-  const onGreetingCardDismissed = () => {
-    setShowGreetingCard(false);
-    requestAnimationFrame(() => inputBoxHandle.current?.focus());
   };
 
   return (
     <>
       {showGreetingCard && (
-        <GreetingCard
-          onSuggestionClicked={onSuggestionClicked} 
-          onDismiss={onGreetingCardDismissed}
-        />
+        <GreetingCard onSuggestionClicked={onSuggestionClicked} />
       )}
     
       <div className="m-2 md:m-4 pb-24">
