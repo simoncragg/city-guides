@@ -2,10 +2,9 @@ import React from "react";
 
 import type { AgentMessageType } from "../types";
 import AgentAvatar from "./AgentAvatar";
+import AgentMessageStatus from "./AgentMessageStatus";
 import PendingAgentIndicator from "./PendingAgentIndicator";
-import ThinkingIndicator from "./ThinkingIndicator";
 import { marked } from "marked";
-import { TextShimmer } from "./TextShimmer";
 
 interface Props {
   message: AgentMessageType;
@@ -40,10 +39,7 @@ const AgentMessage: React.FC<Props> = ({ message, lastAgent }) => {
               __html: marked.parse(message.content) as string,
             }}
           />
-          {message.thinkingStatus
-            ? <TextShimmer>{message.thinkingStatus}</TextShimmer>
-            : (message.status === "thinking" || message.status === "deferring") && <ThinkingIndicator />
-          }
+          <AgentMessageStatus message={message} />
         </div>
       </div>
     </div>
