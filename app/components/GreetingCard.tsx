@@ -16,6 +16,7 @@ const GreetingCard: React.FC<GreetingCardProps> = ({ onSuggestionClicked }) => {
     <div
       className={`
         flex flex-col items-center gap-6
+        -mt-8
         mx-auto 
         px-4 md:px-6 
         pt-4 pb-6
