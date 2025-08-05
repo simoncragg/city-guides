@@ -159,10 +159,10 @@ function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContex
   const enqueue = (data: string) => ctx.enqueue(`event:message_thinking_status\ndata:${data}\n\n`);
   switch (name) {
     case "get_place": 
-      enqueue("Retrieving location info");
+      enqueue("Fetching location info");
       break;
     case "get_photo_uri":
-      enqueue("Retrieving photos");
+      enqueue("Getting photos");
       break;
   }
 }

@@ -2,21 +2,23 @@ import React from "react";
 
 import type { AgentMessageType } from "../types";
 import ThinkingIndicator from "./ThinkingIndicator";
-import { TextShimmer } from "./TextShimmer";
+import ThinkingStatus from "./ThinkingStatus";
 
 interface AgentMessageStatusProps {
   message: AgentMessageType;
 }
 
 const AgentMessageStatus: React.FC<AgentMessageStatusProps> = ({ message }) => {
-  return (
-    <>
-      {message.thinkingStatus
-        ? <TextShimmer>{message.thinkingStatus}</TextShimmer>
-        : (message.status === "thinking" || message.status === "deferring") && <ThinkingIndicator />
-      }
-    </>
+  
+  if (message.thinkingStatus) return (
+    <ThinkingStatus thinkingStatus={message.thinkingStatus} />
   );
+
+  if (message.status === "thinking" || message.status === "deferring") {
+    return (
+      <ThinkingIndicator />
+    );
+  }
 };
 
 export default AgentMessageStatus;

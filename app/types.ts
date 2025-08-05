@@ -5,8 +5,10 @@ export type ChatMessageType = {
   content: string;
 };
 
+export type ThinkingStatusType = "Fetching location info" | "Getting photos";
+
 export type AgentMessageType = ChatMessageType & {
   agent?: string;
-  thinkingStatus?: string;
+  thinkingStatus?: ThinkingStatusType;
   status: "pending" | "thinking" | "outputting" | "deferring" | "done";
 };

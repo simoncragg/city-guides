@@ -51,14 +51,10 @@ const ChatLog: React.FC<ChatLogProps> = ({ messages }) => {
             key={idx} 
             ref={isLastUserMessage ? lastUserMessageRef : null}
             className="grid items-start gap-2">
-            {message.role === "user" ? (
-              <UserMessage message={message} />
-            ) : (
-              <AgentMessage
-                message={message as AgentMessageType}
-                lastAgent={lastAgent}
-              />
-            )}
+            {message.role === "user"
+              ? <UserMessage message={message} />
+              : <AgentMessage message={message as AgentMessageType} lastAgent={lastAgent} />
+            }
           </article>
         );
       })}
