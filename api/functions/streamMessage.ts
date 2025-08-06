@@ -159,7 +159,7 @@ function handleToolCallOutputItem({ rawItem }: RunToolCallOutputItem, ctx: Messa
 function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContext) {
   const enqueue = (data: string) => ctx.enqueue(`event:message_thinking_status\ndata:${data}\n\n`);
   switch (name) {
-    case "find_place": 
+    case "find_places": 
       enqueue("Fetching location info" as ThinkingStatusType);
       break;
     case "get_photo_uri":

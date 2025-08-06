@@ -6,7 +6,7 @@ import londonGuide from "../guides/london";
 import parisGuide from "../guides/paris";
 import romeGuide from "../guides/rome";
 
-import findPlaceTool from "../tools/findPlaceTool";
+import findPlacesTool from "../tools/findPlacesTool";
 import getPhotoUriTool from "../tools/getPhotoUriTool";
 
 const guides = [
@@ -15,9 +15,9 @@ const guides = [
 
 const toolUseTemplate = `
 ## TOOL USE
-- Use find_place when the user mentions or asks about a location.
-- Include the term {{CITY}} in the query.
-- After find_place returns, you can call get_photo_uri with one of place.photos[].name (usually the first).
+- Use find_places when the user mentions or asks about one or more locations.
+- Include the term {{CITY}} in each query.
+- For each place returned from find_places, you can call get_photo_uri using one of place.photos[].name (usually the first).
 - Never invent photo names or URLs; always call the tool when you need to include a photo in your response.
 - Embed the image in markdown using the photoUri returned by the tool.
 `;
@@ -30,7 +30,7 @@ const cityGuideAgents = guides.map(guide => {
     name: guide.name,
     model: "gpt-4o",
     instructions: `${guide.instructions}\n\n${toolUsePolicy}`,
-    tools: [findPlaceTool, getPhotoUriTool]
+    tools: [findPlacesTool, getPhotoUriTool]
   });
 });
 
