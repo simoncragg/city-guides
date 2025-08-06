@@ -1,9 +1,9 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
-import { getPlaceAsync } from "../services/places";
+import { findPlaceAsync } from "../services/places";
 
-const getPlaceTool = tool({
-  name: "get_place",
+const findPlaceTool = tool({
+  name: "find_place",
   description:
     "Look up a real-world place from free text and return id, canonical name, address, and photo references. Call this before fetching a photo.",
   parameters: z.object({
@@ -12,8 +12,8 @@ const getPlaceTool = tool({
       .describe("Natural-language place description, e.g. 'Eiffel Tower, Paris' or 'Louvre Museum, Paris, France'."),
   }),
   async execute({ query }) {
-    return await getPlaceAsync(query);
+    return await findPlaceAsync(query);
   },
 });
 
-export default getPlaceTool;
+export default findPlaceTool;

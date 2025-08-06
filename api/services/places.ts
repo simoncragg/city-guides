@@ -5,7 +5,7 @@ const apiBaseUrl = process.env.GOOGLE_PLACES_API_BASEURL;
 const apiKey = process.env.GOOGLE_PLACES_API_KEY as string;
 const cacheDurationMs = 1000 * 60 * 60 * 24 * 30;
 
-export async function getPlaceAsync(textQuery: string): Promise<PlaceType | null> {
+export async function findPlaceAsync(textQuery: string): Promise<PlaceType | null> {
 
   const place = await getFromCache(textQuery);
   return place
