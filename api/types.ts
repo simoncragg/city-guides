@@ -1,6 +1,7 @@
 import { AgentInputItem } from "@openai/agents";
 
-type RoleType = "system" | "user" | "assistant";
+export type RoleType = "system" | "user" | "assistant";
+export type ThinkingStatusType = "Fetching location info" | "Getting photos";
 
 export type ChatMessage = {
   role: RoleType;

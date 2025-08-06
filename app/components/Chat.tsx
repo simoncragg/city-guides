@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import type { AgentMessageType, ChatMessageType } from "../types";
+import type { AgentMessageType, ChatMessageType, ThinkingStatusType } from "../types";
 
 import ChatLog from "./ChatLog";
 import GreetingCard from "./GreetingCard";
@@ -74,9 +74,10 @@ const Chat: React.FC = () => {
   };
 
   const handleThinkingStatusEvent = (data: string) => {
+    const thinkingStatus = data as ThinkingStatusType;
     updateLastMessage(last => ({ 
       ...last, 
-      thinkingStatus: data
+      thinkingStatus
     }));
   };
 

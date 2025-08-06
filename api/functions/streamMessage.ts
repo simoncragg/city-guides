@@ -18,7 +18,8 @@ import type {
   ChatSession, 
   MessageStreamCompletedCallback,
   MessageStreamContext,
-  StreamMessagePayload, 
+  StreamMessagePayload,
+  ThinkingStatusType, 
 } from "../types";
 
 import silentRouter from "../agents/silentRouter";
@@ -159,10 +160,10 @@ function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContex
   const enqueue = (data: string) => ctx.enqueue(`event:message_thinking_status\ndata:${data}\n\n`);
   switch (name) {
     case "get_place": 
-      enqueue("Fetching location info");
+      enqueue("Fetching location info" as ThinkingStatusType);
       break;
     case "get_photo_uri":
-      enqueue("Getting photos");
+      enqueue("Getting photos" as ThinkingStatusType);
       break;
   }
 }
