@@ -5,7 +5,7 @@ import { findPlacesAsync } from "../services/places";
 const findPlacesTool = tool({
   name: "find_places",
   description:
-    "Look up a real-world places from free text and return id, canonical name, address, and photo references for each place. Call this before fetching a photo.",
+    "Look up real-world places from free text and return id, canonical name, address, and photo references for each place. Call this before fetching a photo.",
   parameters: z.object({
     queries: z
       .array(z.string())

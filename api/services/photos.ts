@@ -7,8 +7,28 @@ const mediaQuery = new URLSearchParams({
   skipHttpRedirect: "true",
 }).toString();
 
-export async function getPhotoUriAsync(photoName: string): Promise<string | null> {
+export async function getPhotosAsync(photoNames: string[]): Promise<Record<string, string | null>> {
   
+  const settled = await Promise.allSettled(
+    photoNames.map((photoName) => getPhotoUriAsync(photoName))
+  );
+
+  const result: Record<string, string | null> = {};
+  settled.forEach((entry, idx) => {
+    const name = photoNames[idx];
+    if (entry.status === "fulfilled") {
+      result[name] = entry.value;
+    } else {
+      console.error(`Error fetching photo for "${name}":`, entry.reason);
+      result[name] = null;
+    }
+  });
+
+  return result;
+}
+
+async function getPhotoUriAsync(photoName: string): Promise<string | null> {
+
   const mediaUrl = buildMediaUrl(photoName);
   let res: Response;
 
