@@ -13,19 +13,21 @@ const guides = [
   barcelonaGuide, berlinGuide, londonGuide, parisGuide, romeGuide
 ];
 
-const toolUseTemplate = `
+const toolUsePolicy = `
 ## TOOL USE
-- Use find_places when the user mentions or asks about one or more locations.
-- Include the term {{CITY}} in each query.
-- For each place returned from find_places, you can call get_photo_uri using one of place.photos[].name (usually the first).
-- Never invent photo names or URLs; always call the tool when you need to include a photo in your response.
-- Embed the image in markdown using the photoUri returned by the tool.
+
+- **find_places** 
+  - Use \`find_places\` to retrieve photo resource names and links for one or more locations.
+  - Before calling, gather all required queries so you only use the tool once per response.
+
+- **get_photo_uri**   
+  - For each place returned from find_places, you can call get_photo_uri using one of place.photos[].name (usually the first).
+  - Never invent photo names or URLs; always call the tool when you need to include a photo in your response.
+  - Embed the image in markdown using the photoUri returned by the tool.
 `;
 
 const cityGuideAgents = guides.map(guide => {
   
-  const toolUsePolicy = `${toolUseTemplate.replace("{{CITY}}", guide.city)}`;
-
   return new Agent({
     name: guide.name,
     model: "gpt-4o",
