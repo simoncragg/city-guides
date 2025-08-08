@@ -4,7 +4,7 @@ import type { AgentMessageType } from "../types";
 import AgentAvatar from "./AgentAvatar";
 import AgentMessageStatus from "./AgentMessageStatus";
 import PendingAgentIndicator from "./PendingAgentIndicator";
-import { marked } from "marked";
+import MarkdownContent from "./MarkdownContent";
 
 interface Props {
   message: AgentMessageType;
@@ -26,19 +26,7 @@ const AgentMessage: React.FC<Props> = ({ message, lastAgent }) => {
         </span>
 
         <div className="text-neutral-950">
-          <span
-            className={`
-              [&_ul]:mb-4 [&_ol]:mb-4
-              [&_ul>li]:mt-4 [&_ol>li]:mt-4
-              [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2.5
-              [&_p]:inline
-            [&_a]:text-sky-800
-              [&_img]:rounded-xl [&_img]:my-4
-            `}
-            dangerouslySetInnerHTML={{
-              __html: marked.parse(message.content) as string,
-            }}
-          />
+          <MarkdownContent markdown={message.content} />
           <AgentMessageStatus message={message} />
         </div>
       </div>
