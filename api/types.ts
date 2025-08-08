@@ -50,6 +50,7 @@ export type PhotoType = {
   name: string;
   widthPx?: number;
   heightPx?: number;
+  googleMapsUri: string;
 };
 
 /* Cache Item */

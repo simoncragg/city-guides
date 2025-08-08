@@ -1,12 +1,39 @@
 import type { PlaceType } from "../types";
 import { getByKey, upsertCacheItem } from "../db/cacheItem";
 
-const apiBaseUrl = process.env.GOOGLE_PLACES_API_BASEURL;
-const apiKey = process.env.GOOGLE_PLACES_API_KEY as string;
-const cacheDurationMs = 1000 * 60 * 60 * 24 * 30;
+const API_BASEURL = process.env.GOOGLE_PLACES_API_BASEURL;
+const API_KEY = process.env.GOOGLE_PLACES_API_KEY as string;
+const CACHE_DURATION_MS = 1000 * 60 * 60 * 24 * 30;
+const MAX_PHOTOS = 3;
+
+interface PlaceDto {
+  id: string;
+  name: string;
+  displayName: {
+    text: string;
+    languageCode: string;
+  };
+  formattedAddress: string;
+  photos: PhotoDto[];
+}
+
+interface PhotoDto {
+  name: string;
+  widthPx: number;
+  heightPx: number;
+  googleMapsUri: string;
+  flagContentUri: string;
+  authorAttributions: AuthorAttributionDto[];
+}
+
+interface AuthorAttributionDto {
+  uri: string;
+  photoUri: string;
+  displayName: string;
+}
 
 export async function findPlacesAsync(textQueries: string[]): Promise<Record<string, PlaceType | null>> {
-  
+
   const cacheEntries = await Promise.all(
     textQueries.map(async (textQuery) => ({
       textQuery,
@@ -47,11 +74,11 @@ async function getFromCache(textQuery: string): Promise<PlaceType | null> {
 }
 
 async function fetchAndCache(textQuery: string): Promise<PlaceType | null> {
-  const res = await fetch(`${apiBaseUrl}/places:searchText`, {
+  const res = await fetch(`${API_BASEURL}/places:searchText`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Goog-Api-Key": apiKey,
+      "X-Goog-Api-Key": API_KEY,
       "X-Goog-FieldMask": [
         "places.id",
         "places.displayName",
@@ -62,15 +89,14 @@ async function fetchAndCache(textQuery: string): Promise<PlaceType | null> {
     body: JSON.stringify({ textQuery, pageSize: 1 }),
   });
 
-  const { places } = await res.json();
-
-  const place = places?.length > 0 ? places[0] : null;
+  const { places: placeDtos } = await res.json();
+  const place = placeDtos?.length > 0 ? mapToPlace(placeDtos[0]) : null;
 
   if (place) {
     await upsertCacheItem({
       key: buildCacheKey(textQuery),
       value: place,
-      staleAt: new Date(Date.now() + cacheDurationMs),
+      staleAt: new Date(Date.now() + CACHE_DURATION_MS),
     });
   }
 
@@ -79,4 +105,17 @@ async function fetchAndCache(textQuery: string): Promise<PlaceType | null> {
 
 function buildCacheKey(textQuery: string): string {
   return "place::" + textQuery;
+}
+
+function mapToPlace(place: PlaceDto): PlaceType {
+  const photos = (place.photos ?? [])
+    .slice(0, MAX_PHOTOS)
+    .map(({ name, widthPx, heightPx, googleMapsUri }) => ({
+      name,
+      widthPx,
+      heightPx,
+      googleMapsUri,
+    }));
+
+  return { ...place, photos };
 }
