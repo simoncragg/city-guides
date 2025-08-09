@@ -61,7 +61,7 @@ const InputBox = forwardRef<InputBoxHandle, InputBoxProps>((props, ref) => {
           type="button"
           aria-label={isProcessing ? "Stop" : "Send"}
           onClick={handleActionButtonClick}
-          className="absolute bottom-3 right-2 p-3 bg-sky-500 text-white rounded-full shadow hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
+          className="absolute bottom-3.5 right-2 p-3 bg-sky-500 text-white rounded-full shadow hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
         >
           {isProcessing ? <FaStop /> : <FaArrowUp />}
         </button>
