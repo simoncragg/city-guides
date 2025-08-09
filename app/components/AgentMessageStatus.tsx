@@ -2,7 +2,7 @@ import React from "react";
 
 import type { AgentMessageType } from "../types";
 import ThinkingIndicator from "./ThinkingIndicator";
-import ThinkingStatus from "./ThinkingStatus";
+import ThinkingActivity from "./ThinkingActivity";
 
 interface AgentMessageStatusProps {
   message: AgentMessageType;
@@ -10,8 +10,8 @@ interface AgentMessageStatusProps {
 
 const AgentMessageStatus: React.FC<AgentMessageStatusProps> = ({ message }) => {
   
-  if (message.thinkingStatus) return (
-    <ThinkingStatus thinkingStatus={message.thinkingStatus} />
+  if (message.thinkingActivity) return (
+    <ThinkingActivity activity={message.thinkingActivity} />
   );
 
   if (message.status === "thinking" || message.status === "deferring") {

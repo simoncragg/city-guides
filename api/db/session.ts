@@ -1,7 +1,7 @@
-import { neon } from '@netlify/neon';
-import type { AgentInputItem } from '@openai/agents';
-import type { ChatSession } from '../types';
-import { assert } from '../utils/assert';
+import { neon } from "@netlify/neon";
+import type { AgentInputItem } from "@openai/agents";
+import type { ChatSession } from "../types";
+import assert from "../utils/assert";
 
 const sql = neon();
 

@@ -19,11 +19,11 @@ import type {
   MessageStreamCompletedCallback,
   MessageStreamContext,
   StreamMessagePayload,
-  ThinkingStatusType, 
 } from "../types";
 
 import silentRouter from "../agents/silentRouter";
-import { HttpError, assert } from "../utils/assert";
+import assert, { HttpError } from "../utils/assert";
+import buildThinkingActivity from "../builders/thinkingActivityBuilder";
 import { createSession, getSession, updateSession } from "../db/session";
 
 async function streamMessage(request: Request) {
@@ -156,15 +156,12 @@ function handleToolCallOutputItem({ rawItem }: RunToolCallOutputItem, ctx: Messa
   }
 }
 
-function handleFunctionCall({ name }: FunctionCallItem, ctx: MessageStreamContext) {
-  const enqueue = (data: string) => ctx.enqueue(`event:message_thinking_status\ndata:${data}\n\n`);
-  switch (name) {
-    case "find_places": 
-      enqueue("Fetching location info" as ThinkingStatusType);
-      break;
-    case "get_photo_uri":
-      enqueue("Getting photos" as ThinkingStatusType);
-      break;
+function handleFunctionCall(fci: FunctionCallItem, ctx: MessageStreamContext) {
+  const enqueue = (jsonData: string) => ctx.enqueue(`event:message_thinking_activity\ndata:${jsonData}\n\n`);
+  const activity = buildThinkingActivity(fci);
+  if (activity) {
+    const jsonData = JSON.stringify(activity);
+    enqueue(jsonData);
   }
 }
 

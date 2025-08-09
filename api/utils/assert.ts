@@ -5,7 +5,7 @@ export class HttpError extends Error {
   }
 }
 
-export function assert(condition: unknown, message: string, status = 500): asserts condition {
+export default function assert(condition: unknown, message: string, status = 500): asserts condition {
   if (!condition) {
     throw new HttpError(status, message);
   }

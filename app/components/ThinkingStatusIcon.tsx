@@ -11,12 +11,12 @@ interface ThinkingStatusIconProps {
 
 const ThinkingStatusIcon: React.FC<ThinkingStatusIconProps> = ({ thinkingStatus, size }) => {
 
-  const classes = `w-${size} h-${size} text-gray-700`;
+  const classes = `w-${size} h-${size} text-gray-700 mt-1`;
 
   switch (thinkingStatus) {
-    case "Fetching location info": 
+    case "FindingPlaces": 
       return (<IoLocationOutline className={classes} />);
-    case "Getting photos":
+    case "GettingPhotos":
       return (<IoCameraOutline className={classes} />);
   }
 };

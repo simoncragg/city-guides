@@ -1,7 +1,11 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import type { AgentMessageType, ChatMessageType, ThinkingStatusType } from "../types";
+import type {
+  AgentMessageType,
+  ChatMessageType,
+  ThinkingActivityType
+} from "../types";
 
 import ChatLog from "./ChatLog";
 import GreetingCard from "./GreetingCard";
@@ -40,8 +44,8 @@ const Chat: React.FC = () => {
               handleMessageAgentEvent(data);
               break;
 
-            case "message_thinking_status":
-              handleThinkingStatusEvent(data);
+            case "message_thinking_activity":
+              handleThinkingActivityEvent(data);
               break;
 
             case "message_delta":
@@ -68,16 +72,16 @@ const Chat: React.FC = () => {
   const handleMessageAgentEvent = (data: string) => {
     updateLastMessage(last => ({ 
       ...last, 
-      agent: data, 
+      agent: data,
       status: "thinking"
     }));
   };
 
-  const handleThinkingStatusEvent = (data: string) => {
-    const thinkingStatus = data as ThinkingStatusType;
+  const handleThinkingActivityEvent = (data: string) => {
+    const thinkingActivity = JSON.parse(data) as ThinkingActivityType;
     updateLastMessage(last => ({ 
       ...last, 
-      thinkingStatus
+      thinkingActivity
     }));
   };
 
@@ -88,7 +92,7 @@ const Chat: React.FC = () => {
       ...last, 
       agent,
       content: last.content + delta,
-      thinkingStatus: undefined,
+      thinkingActivity: undefined,
       status: delta.length > 0 ? "outputting" : "deferring",
     }));
   };

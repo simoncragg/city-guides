@@ -1,7 +1,7 @@
 import { neon } from '@netlify/neon';
 
 import type { CacheItem, CacheItemRow } from '../types';
-import { assert } from '../utils/assert';
+import assert from '../utils/assert';
 
 const sql = neon();
 

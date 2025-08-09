@@ -1,14 +1,20 @@
 export type RoleType = "system" | "user" | "assistant";
+export type ThinkingStatusType = "FindingPlaces" | "GettingPhotos";
 
 export type ChatMessageType = {
   role: RoleType;
   content: string;
 };
 
-export type ThinkingStatusType = "Fetching location info" | "Getting photos";
+
+export type ThinkingActivityType = {
+  status: ThinkingStatusType;
+  description: string;
+  actions: string[];
+};
 
 export type AgentMessageType = ChatMessageType & {
   agent?: string;
-  thinkingStatus?: ThinkingStatusType;
+  thinkingActivity?: ThinkingActivityType;
   status: "pending" | "thinking" | "outputting" | "deferring" | "done";
 };

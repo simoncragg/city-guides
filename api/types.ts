@@ -1,7 +1,7 @@
 import { AgentInputItem } from "@openai/agents";
 
 export type RoleType = "system" | "user" | "assistant";
-export type ThinkingStatusType = "Fetching location info" | "Getting photos";
+export type ThinkingStatusType = "FindingPlaces" | "GettingPhotos";
 
 export type ChatMessage = {
   role: RoleType;
@@ -32,6 +32,12 @@ export type MessageStreamContext = {
 };
 
 export type MessageStreamCompletedCallback = (history: AgentInputItem[], lastAgent: string) => Promise<void>;
+
+export type ThinkingActivityType = {
+  status: ThinkingStatusType;
+  description: string;
+  actions: string[];
+};
 
 /* Google Places API */
 
