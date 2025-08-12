@@ -20,7 +20,7 @@ Unlike most multi-agent apps that hide their specialised agents behind a single 
 
 The diagram below provides a high-level overview of the key agent configurations.
 
-<img src="./docs/agent-orchestration.png" width="741" alt="Agent Orchestration Diagram">
+<img src="./docs/agent-orchestration-min.png" width="741" alt="Agent Orchestration Diagram">
 
 ### Routing
 
