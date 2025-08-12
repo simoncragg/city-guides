@@ -14,6 +14,8 @@ The user joins a group chat where five specialised agents, each representing a d
 
 Unlike most multi-agent apps that hide their specialised agents behind a single persona, City Guides makes that coordination transparent and part of the experience.
 
+<img src="./docs/screenshot-min.png" width="600" alt="City Guides screenshot">
+
 ## Agent Orchestration
 
 The diagram below provides a high-level overview of the key agent configurations.
